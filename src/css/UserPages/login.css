@@ -1,0 +1,103 @@
+.img-login-bg{
+  background-image: url('');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.login-animate{
+  position: relative;
+  color: white;
+  width: 200px;
+  font-size: 28px;
+  padding: 10px;
+  text-align: center;
+  margin-bottom: 50px;
+  transition: all 0.5s;
+  cursor: pointer;
+}
+
+.ard {
+  position: relative;
+}
+
+.ard::before {
+  position: absolute;
+  background-color: white;
+  content: '';
+  top: -30px;
+  left: 0;
+  height: 120px;
+  width: 100%;
+  border-top-left-radius: 60px;
+  border-bottom-left-radius: 60px;
+  transition: all 1s ease; 
+}
+
+.ard.register-active::before {
+  top: 90px; 
+}
+
+.active{
+  color: black;
+}
+
+
+.App {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 40px;
+  padding: 4px 0;
+}
+
+.icon {
+  font-size: 28px;
+  margin-right: 8px;
+  color: #171717B2;
+}
+
+.custom-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 28px;
+  padding: 0px 120px;
+  background: none;
+  transform: translateX(-110px);
+}
+
+.custom-input::placeholder {
+  color: #171717B2;
+}
+
+.btn-login{
+  background-color: #FF9513;
+  border: none;
+  padding: 15px 30px;
+  font-size: 28px;
+  color: white;
+  border-radius: 50px;
+  transition: all 0.5s;
+}
+
+.btn-login:hover{
+  color: black;
+  background-color: #eeb876;
+}
+.footer-login p{
+  font-size: 20px;
+}
+
+.disable{
+  display: none;
+}
+
+.avaiable{
+  display: block;
+}

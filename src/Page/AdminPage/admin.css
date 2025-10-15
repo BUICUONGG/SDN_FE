@@ -1,0 +1,12 @@
+.class1{
+    width: 100vw;
+    height: 0vh;
+    background: white;
+    position: absolute;
+    bottom: 0;
+    transition: all 2s;
+}
+
+.class2{
+    height: 100vh;
+}

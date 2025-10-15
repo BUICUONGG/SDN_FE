@@ -1,0 +1,149 @@
+.progress-bar-item{
+  padding: 2px 10px;
+  border-radius: 20px;
+  border: 5px solid #D9D9D9;
+  color: #747474;
+}
+
+
+.hr-bar{
+  display: inline;
+  border: 3px solid #D9D9D9;
+  width: 100%;
+}
+
+.hr-bar-2{
+  display: inline;
+  border: 3px solid #D9D9D9;
+  width: 100%;
+}
+
+.hr-bar-3{
+  display: inline;
+  border: 3px solid #D9D9D9;
+  width: 100%;
+}
+
+
+.progress-bar-item-last{
+  padding: 2px 10px;
+  border-radius: 20px;
+  border: 5px solid #D9D9D9;
+  color: #747474;
+}
+
+.active-bar{
+  border: 5px solid transparent;
+  background: linear-gradient(#6EB566, #6EB566) padding-box,
+              linear-gradient(90deg, #D4FFCF 0%, #A3FF98 69%) border-box;
+  color: white;
+}
+
+.active-hr{
+  border: 3px solid transparent;
+  background: linear-gradient(#6EB566, #6EB566) padding-box,
+              linear-gradient(-90deg, #D9D9D9 35%, #A3FF98 69%) border-box;
+}
+
+.actived-hr{
+  border: 3px solid transparent;
+  background: linear-gradient(#6EB566, #6EB566) padding-box,
+              linear-gradient(-90deg, #A3FF98 35%, #A3FF98 35%) border-box;
+}
+
+.ant-checkbox-inner{
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 10px !important;
+  /* background-color: #6EB566 !important;
+  border-color: #6EB566 !important */
+}
+
+.ant-checkbox-checked .ant-checkbox-inner{
+  background-color: #6EB566 !important;
+  border-color: #6EB566 !important
+}
+
+.identity-wrapper {
+  font-family: inherit;
+  display: flex;
+}
+
+.title {
+  color: #000;
+  font-size: 20px;
+  font-weight: 400;
+  margin-bottom: 8px;
+  width: 40%;
+}
+
+.upload-container {
+  display: flex;
+  gap: 16px;
+}
+
+.upload-box {
+  width: 140px;
+  height: 140px;
+  border: 2px dashed #bdbdbd;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.upload-box:hover {
+  border-color: #1976d2;
+}
+
+.upload-plus {
+  font-size: 32px;
+  line-height: 1;
+  color: #8d8d8d;
+}
+
+.upload-caption {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  background: #f3f3f3;
+  font-size: 14px;
+  padding: 4px 0;
+  font-weight: 500;
+}
+
+.upload-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.note {
+  font-size: 13px;
+  margin-top: 12px;
+  color: #666;
+  max-width: 300px;
+}
+
+.btn-upload {
+  margin-top: 16px;
+  padding: 8px 16px;
+  font-size: 15px;
+  font-weight: 600;
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-upload:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

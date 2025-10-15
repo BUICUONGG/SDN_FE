@@ -1,0 +1,38 @@
+.regisSell p{
+    padding: 5% 0;
+}
+.regisSell__input input{
+    width: 100%;
+    margin-bottom: 7%;
+    border-radius: 10px;
+    font-size: 28px;
+    padding-left: 2%;
+}
+
+.regisSell__input .sentBtn{
+    border: solid 1px #FF9513;
+    color: #FF9513;
+    background-color: white;
+    border-radius: 10px;
+    transition: all 0.5s;
+}
+
+.sentBtn:hover{
+    color: white;
+    background-color: #FF9513;
+    border: solid 1px white;
+}
+
+.btnNext{
+    background-color: #FF9513;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    transition: all 0.5s;
+}
+
+.btnNext:hover{
+    color: #FF9513;
+    background-color: white;
+    border: solid 1px #FF9513;
+}

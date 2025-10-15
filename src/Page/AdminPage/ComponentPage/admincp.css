@@ -1,0 +1,123 @@
+.dashboard-container {
+  padding: 24px;
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+  background: rgb(247, 247, 247);
+}
+
+.stats-boxes {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  flex: 1;
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.stat-title {
+  color: gray;
+  font-size: 14px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 8px;
+}
+
+.stat-badge {
+  color: green;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.main-content {
+  display: flex;
+  gap: 20px;
+}
+
+.chart-box {
+  flex: 2;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.wallet-box {
+  flex: 1;
+  background: #CAF7C6;
+  padding: 20px;
+  border-radius: 8px;
+  color: #206a35;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.wallet-label {
+  margin-bottom: 16px;
+  color: gray;
+}
+
+.wallet-transactions {
+  margin-bottom: 16px;
+}
+
+.wallet-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.wallet-item .positive {
+  color: green;
+}
+
+.wallet-item .negative {
+  color: red;
+}
+
+.wallet-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-send,
+.btn-receive {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.btn-send {
+  background-color: #ff4d4d;
+}
+
+.btn-receive {
+  background-color: #4d90fe;
+}
+
+.wallet-summary {
+  display: flex;
+  justify-content: space-between;
+
+}
+
+.summary-row-db {
+  text-align: center;
+  width: 50%;
+}
+
+

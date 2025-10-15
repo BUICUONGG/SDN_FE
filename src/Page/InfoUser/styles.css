@@ -1,0 +1,183 @@
+@import url('https://fonts.googleapis.com/css2?family=Afacad:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Allura&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.allura-regular {
+  font-family: "Allura", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.header-intro {
+  background-color: rgb(110, 181, 102);
+  padding: 0 6%;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-intro .font-xmark {
+  font-family: 'Afacad', sans-serif;
+  letter-spacing: 3px;
+  color: white;
+  font-size: 60px;
+}
+@media screen and (max-width: 1024px) {
+  .header-intro .font-xmark {
+    font-size: 50px;
+  }
+}
+@media screen and (max-width: 480px) {
+  .header-intro .font-xmark {
+    font-size: 30px;
+  }
+}
+
+.header-intro .language {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  font-size: 16px;
+}
+
+
+
+.header-intro .icon {
+  font-size: 22px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.iconglo:hover {
+  transform: scale(0.9);
+}
+
+.header-intro .cart {
+  background-color: white;
+  border-radius: 50%;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 50px;
+}
+
+.header-intro .menu-button {
+  background-color: #2d2b27;
+  color: white;
+  border: none;
+  padding: 10px 34px;
+  border-radius: 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.menu-button:hover {
+  background-color: #575651;
+}
+
+.intro-page {
+  background-image: url('../../img/EXE/bg.png');
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center;
+}
+
+.container-intro {
+  color: white;
+  padding: 10% 5%;
+  background: rgba(0, 0, 0, 0.4);
+  height: 100%;
+}
+
+.slick-slide {
+  padding: 10px;
+}
+
+.banner-intro .ant-card-body {
+  padding: 0;
+}
+
+
+.footer-intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 100px 80px;
+}
+
+.footer-intro .footer-left {
+  text-align: left;
+  line-height: 0px;
+  text-align: center;
+}
+
+.footer-intro .logo {
+  font-size: 95px;
+  font-weight: 500;
+  color: #64b964;
+  letter-spacing: 13px;
+  font-family: 'Afacad', sans-serif;
+}
+
+.footer-intro .slogan {
+  font-size: 20px;
+  color: #64b964;
+}
+
+.footer-intro .footer-right {
+  text-align: left;
+  font-size: 16px;
+  color: black;
+}
+
+.footer-intro .social-icons {
+  margin-top: 10px;
+  display: flex;
+  gap: 15px;
+  font-size: 20px;
+}
+
+.footer-intro .social-icons svg {
+  cursor: pointer;
+  transition: color 0.3s ease-in-out;
+}
+
+.footer-intro .social-icons svg:hover {
+  color: #64b964;
+}
+
+.footer-right p {
+  color: black;
+}
+
+.officer-intro {
+  background-image: url('../../img/EXE/8.png');
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.officer-intro2 {
+  background: linear-gradient(45deg, #FFFFFF 15%, #DFFCDC 70%);
+}
+
+.guest-intro-container{
+  background-image: url('../../img/EXE/8.png');
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}

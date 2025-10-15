@@ -1,0 +1,53 @@
+.img-bg{
+    background-image: url(../img/imgbg.jpg);
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    padding: 8% 0;
+}
+
+
+.layoutuser p{
+    cursor: pointer;
+    color: black;
+    font-weight: normal;
+    font-size: 14px;
+}
+
+.sidebar {
+  padding: 10px 10px;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  padding: 5px 8px;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  transition: all 0.1s;
+  background-color: white;
+}
+
+.sidebar-item:hover {
+  background-color: #f0f0f0;
+
+}
+.sidebar-item.active {
+  background: linear-gradient(90deg, #AADB9A 22%, #2DB71E 90%);
+  color: white;
+}
+
+.sidebar-icon {
+  margin-right: 10px;
+  font-size: 16px;
+}
+
+.sidebar-label {
+  font-size: 15px;
+}

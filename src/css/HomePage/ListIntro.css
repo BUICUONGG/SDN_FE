@@ -1,0 +1,13 @@
+.custom-dots li {
+    width: 10px !important;
+    height: 10px !important;
+    border-radius: 50% !important; 
+    background-color: gray !important;
+  }
+  
+  .custom-dots li.slick-active {
+    background-color: white !important; 
+    width: 12px !important;
+    height: 12px !important;
+  }
+  

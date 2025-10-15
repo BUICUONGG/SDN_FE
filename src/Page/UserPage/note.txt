@@ -1,0 +1,86 @@
+<div
+          style={{
+            background: "white",
+            padding: "2% 2%",
+          }}
+        >
+          <div>
+            <span style={{ fontWeight: "bold", marginRight: "1%" }}>
+              {allName}
+            </span>
+            <span style={{ fontSize: "14px", opacity: "0.5" }}>
+              (+84) {phoneNumber}
+            </span>
+            <p style={{ fontSize: "13px", lineHeight: "15px" }}>
+              {userData?.addresses.map((item, index) => (
+                <div style={{ position: "relative" }} key={index}>
+                  <span>{item?.detail}</span>
+                  <br />
+                  <span>
+                    {item?.ward}, {item?.district}, {item?.province}
+                  </span>
+                  <button
+                    onClick={() => handleEditAddress(item)}
+                    style={{
+                      position: "absolute",
+                      bottom: "60%",
+                      right: "5%",
+                      padding: "5px 1%",
+                      borderRadius: "10px",
+                      border: "2px solid #6EB566",
+                      color: "#6EB566",
+                      outline: "none",
+                    }}
+                  >
+                    Sửa địa chỉ
+                  </button>
+                  <UpdateAddress
+                    isOpen={isModalUp}
+                    onClose={closeUpModal}
+                    address={editingAddress}
+                  />
+                  <Popconfirm
+                    
+                    title="Xóa địa chỉ"
+                    description="Bạn có chắc muốn xóa địa chỉ này không?"
+                    onConfirm={() => handleDeleteAddress(item?.id)}
+                    onCancel={cancel}
+                    okText="Có"
+                    cancelText="Không"
+                  >
+                    <Button
+                    style={{
+                        position: "absolute",
+                        top: "60%",
+                        right: "5%",
+                        padding: "5px 1%",
+                        borderRadius: "10px",
+                        border: "2px solid red",
+                        color: "red",
+                        outline: "none",
+                      }}
+                    >Xóa địa chỉ</Button>
+                  </Popconfirm>
+                </div>
+              ))}
+            </p>
+            <button
+              style={{
+                background: "none",
+                padding: "5px 1%",
+                borderRadius: "10px",
+                border: "2px solid #6EB566",
+                color: "#6EB566",
+              }}
+            >
+              Địa chỉ mặc định
+            </button>
+            <hr />
+          </div>
+        </div>
+
+
+
+lỗi render field
+
+css xóa lỗi

@@ -1,0 +1,88 @@
+.cart-animation-container {
+    background-color: #6EB566;
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    animation: ChangeColor 0.5s ease 2.1s forwards;
+
+    position: fixed; /* 👉 Đè lên toàn bộ UI */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999; 
+}
+
+.product-icon {
+    font-size: 40px;
+    position: absolute;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: dropToCart 2s ease-in-out forwards;
+    color: white;
+}
+
+.cart-icon {
+    z-index: 2;
+    margin-top: 20px;
+    transition: transform 0.3s ease;
+    color: white;
+}
+
+.xmark-text {
+    margin-top: 20px;
+    font-size: 36px;
+    font-weight: bold;
+    color: #25BA4D;
+    opacity: 0;
+    animation: fadeIn 0.5s ease 2.1s forwards;
+}
+
+@keyframes dropToCart {
+  0% {
+    transform: translateX(-50%) translateY(250px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) translateY(350px);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+
+@keyframes ChangeColor {
+    to {
+        background: white;
+    }
+}
+
+.loading-dots::after {
+  content: " ";
+  display: inline-block;
+  width: 1em;
+  text-align: left;
+}
+
+@keyframes dots {
+  0%   { content: ""; }
+  33%  { content: "."; }
+  66%  { content: ".."; }
+  100% { content: "..."; }
+}
+
+.loading-dots::after {
+  content: "";
+  animation: dots 1.5s steps(3, end) infinite;
+}

@@ -1,0 +1,19 @@
+/* Chia đều các tab */
+.custom-tabs .ant-tabs-nav {
+  margin: 0;
+  border-bottom: 1px solid #eee;
+  background-color: #fff;
+  width: 100%;
+}
+
+.custom-tabs .ant-tabs-tab {
+  flex: 1;
+  justify-content: center;
+  text-align: center;
+  margin: 0 !important;
+}
+
+.custom-tabs .ant-tabs-nav-list {
+  display: flex;
+  width: 100%;
+}

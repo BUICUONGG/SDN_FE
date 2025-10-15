@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Afacad:wght@400;700&display=swap');
+
+.header{
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: white;
+    box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+a:hover{
+    text-decoration: none;
+    color: gray;
+}
+.font-xmark{
+    font-family: 'Afacad', sans-serif;
+    letter-spacing: 3px;
+}
