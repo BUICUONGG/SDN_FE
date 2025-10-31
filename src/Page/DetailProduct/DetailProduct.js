@@ -67,7 +67,7 @@ export default function DetailProduct() {
       id: product._id,
       name: product.productName || `Pin ${product.battery[0]?.name}`,
       price: product.price,
-      image: product.productimage_url?.[0] || "/default-battery.jpg",
+      image: product.image_url?.[0] || "/default-battery.jpg",
       quantity: 1,
       variantId: product._id,
       shopId: product.creater,
@@ -82,7 +82,7 @@ export default function DetailProduct() {
       id: product._id,
       name: product.productName || `Pin ${product.battery[0]?.name}`,
       price: product.price,
-      image: product.productimage_url?.[0] || "/default-battery.jpg",
+      image: product.image_url?.[0] || "/default-battery.jpg",
       quantity: 1,
       variantId: product._id,
       shopId: product.creater,
@@ -96,11 +96,17 @@ export default function DetailProduct() {
     appService
       .getDetailProduct(id)
       .then((res) => {
-        const data = res.data.product;
-        setProduct(data);
-        if (data.productimage_url?.length > 0) {
-          setSelectedImage(data.productimage_url[0]);
-        }
+        const data = res.data.product || {};
+        // Normalize image_url so downstream code can assume an array
+        const images = Array.isArray(data.image_url)
+          ? data.image_url
+          : data.image_url
+          ? [data.image_url]
+          : [];
+        const normalized = { ...data, image_url: images };
+        setProduct(normalized);
+        // set selected image to first image or a fallback placeholder
+        setSelectedImage(images[0] || "/default-battery.jpg");
       })
       .catch((err) => console.error("Lỗi lấy sản phẩm:", err))
       .finally(() => setTimeout(() => setLoading(false), 800));
@@ -244,7 +250,7 @@ export default function DetailProduct() {
                 paddingBottom: "8px",
               }}
             >
-              {(product.productimage_url || []).slice(startIndex, startIndex + maxThumbnails).map((img, idx) => (
+              {(product.image_url || []).slice(startIndex, startIndex + maxThumbnails).map((img, idx) => (
                 <img
                   key={idx}
                   src={img}

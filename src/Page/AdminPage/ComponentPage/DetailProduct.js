@@ -154,7 +154,7 @@ export default function DetailProduct() {
       >
         <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
           <Image.PreviewGroup>
-            {stores?.productimage_url?.map((url, index) => (
+            {stores?.product.image_url?.map((url, index) => (
               <Image
                 key={index}
                 src={url}
