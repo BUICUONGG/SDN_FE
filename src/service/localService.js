@@ -1,48 +1,58 @@
-import { encryptData, decryptData } from "./cryptoService";
-
 export const localUserService = {
-    get: () => {
-        let encryptedData = localStorage.getItem("USER_INFO");
-        return encryptedData ? decryptData(encryptedData) : null;
-    },
+  get: () => {
+    let userInfoString = localStorage.getItem("USER_INFO");
+    return userInfoString ? JSON.parse(userInfoString) : null;
+  },
 
-    set: (userInfo) => {
-        if (userInfo) {
-            const { metadata } = userInfo;
+  set: (userInfo) => {
+    if (userInfo && typeof userInfo === "object") {
+      const metadata = { ...userInfo }; // Clone để tránh mutate
 
-            if (metadata.accessToken && metadata.refreshToken) {
-                // Mã hóa accessToken và refreshToken trước khi lưu
-                const encryptedAccessToken = encryptData(metadata.accessToken);
-                const encryptedRefreshToken = encryptData(metadata.refreshToken);
+      console.log("Dữ liệu gốc:", metadata);
 
-                localStorage.setItem("ACCESS_TOKEN", encryptedAccessToken);
-                localStorage.setItem("REFRESH_TOKEN", encryptedRefreshToken);
-            } else {
-                console.warn("Thiếu accessToken hoặc refreshToken");
-            }
+      // === LƯU TOKEN RIÊNG (nếu cần dùng nhanh) ===
+      if (metadata.token) {
+        // Lưu trực tiếp mà không mã hóa
+        localStorage.setItem("ACCESS_TOKEN", metadata.token);
+      } else {
+        console.warn("Thiếu token");
+      }
 
-            // Mã hóa toàn bộ USER_INFO trước khi lưu
-            const encryptedUserInfo = encryptData(metadata);
-            localStorage.setItem("USER_INFO", encryptedUserInfo);
-        } else {
-            console.error("Dữ liệu đăng nhập không hợp lệ:", userInfo);
-        }
-    },
+      // Lưu refresh token nếu có
+      if (metadata.refreshToken) {
+        localStorage.setItem("REFRESH_TOKEN", metadata.refreshToken);
+      }
 
-    getAccessToken: () => {
-        const encryptedToken = localStorage.getItem("ACCESS_TOKEN");
-        return encryptedToken ? decryptData(encryptedToken) : null;
-    },
+      // === LƯU TOÀN BỘ USER INFO (trực tiếp, chuyển thành JSON string) ===
+      const userInfoString = JSON.stringify(metadata); // Chuyển object thành string
+      const userIdString = JSON.stringify(metadata.user_id); // Chuyển object thành string
+      localStorage.setItem("USER_INFO", userInfoString);
+      localStorage.setItem("USER_ID", String(metadata.user_id));
 
-    getRefreshToken: () => {
-        const encryptedToken = localStorage.getItem("REFRESH_TOKEN");
-        return encryptedToken ? decryptData(encryptedToken) : null;
-    },
-
-    remove: () => {
-        console.log("Xóa dữ liệu người dùng");
-        localStorage.removeItem("USER_INFO");
-        localStorage.removeItem("ACCESS_TOKEN");
-        localStorage.removeItem("REFRESH_TOKEN");
+      console.log(
+        "Đã lưu USER_INFO + ACCESS_TOKEN vào localStorage (không mã hóa)"
+      );
+    } else {
+      console.error("Dữ liệu đăng nhập không hợp lệ:", userInfo);
     }
+  },
+
+  getAccessToken: () => {
+    return localStorage.getItem("ACCESS_TOKEN") || null;
+  },
+
+  getRefreshToken: () => {
+    return localStorage.getItem("REFRESH_TOKEN") || null;
+  },
+  getUserId: () => {
+    return localStorage.getItem("USER_ID") || null;
+  },
+
+  remove: () => {
+    console.log("Xóa dữ liệu người dùng");
+    localStorage.removeItem("USER_INFO");
+    localStorage.removeItem("ACCESS_TOKEN");
+    localStorage.removeItem("REFRESH_TOKEN");
+    localStorage.removeItem("USER_ID");
+  },
 };

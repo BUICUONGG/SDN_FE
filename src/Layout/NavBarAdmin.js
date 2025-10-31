@@ -85,7 +85,7 @@ export default function NavBarAdmin({ Component }) {
                   <span className="sidebar-icon">
                     <ShopOutlined />
                   </span>
-                  <span className="sidebar-label">Quản lý cửa hàng</span>
+                  <span className="sidebar-label">Quản lý sản phẩm</span>
                 </div>
 
                 <div
@@ -97,7 +97,7 @@ export default function NavBarAdmin({ Component }) {
                   <span className="sidebar-icon">
                     <ProfileOutlined />
                   </span>
-                  <span className="sidebar-label">Quản lý bài đăng</span>
+                  <span className="sidebar-label">Quản lý danh mục</span>
                 </div>
 
                 <div
@@ -109,7 +109,7 @@ export default function NavBarAdmin({ Component }) {
                   <span className="sidebar-icon">
                     <UserOutlined />
                   </span>
-                  <span className="sidebar-label">Quản lý khách hàng</span>
+                  <span className="sidebar-label">Quản lý người dùng</span>
                 </div>
               </div>
 

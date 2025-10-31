@@ -173,9 +173,9 @@ export default function HeaderPayment() {
               fontWeight: "500",
               transition: "font-size 0.3s ease-in-out",
             }}
-            href="/home"
+            href="/"
           >
-            <span className="font-xmark">xmark</span>
+            <span className="font-xmark">V I N E</span>
             <span style={{
               fontSize: "30px",
               marginLeft: "10%",

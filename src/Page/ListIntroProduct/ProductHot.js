@@ -25,10 +25,10 @@ const ProductHot = () => {
   const navigate = useNavigate();
 
   const fetchProducts = async (page, tab) => {
-    setLoading(true);
+    // setLoading(true);
     try {
-      const response = await appService.getAllProduct(1, 1000); // ⚠️ lấy nhiều sản phẩm hơn để lọc
-      let data = response?.data?.metadata?.metadata || [];
+      const response = await appService.getAllProduct();
+      let data = response?.data?.products || [];
 
       if (tab !== "Tất cả") {
         data = data.filter((product) => product.status === tab);
@@ -107,7 +107,7 @@ const ProductHot = () => {
               <Col xs={12} sm={8} md={6} lg={4} xl={4} key={product.id}>
                 <Card
                   hoverable
-                  onClick={() => navigate(`/product/${product.id}`)}
+                  onClick={() => navigate(`/product/${product._id}`)}
                     cover={
                       <div
                         style={{

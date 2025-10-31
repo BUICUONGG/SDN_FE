@@ -35,6 +35,7 @@ import PrivacyPage from "./Page/SubPage/PrivacyPage";
 import PaymentNow from "./Page/Payment/PaymentNow";
 import SearchResults from "./Page/SearchPage/SearchResults";
 import OAuth2RedirectHandler from "./Page/OAuth2RedirectHandler";
+import AutionPage from "./Page/AutionPage/AutionPage";
 
 function App() {
   // eslint-disable-next-line no-unused-vars
@@ -124,6 +125,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout Component={HomePage} />} />
+          <Route path="/auction-channel" element={<Layout Component={AutionPage} />} />
           <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
           <Route path="/register-seller" element={<Layout Component={RegisterSeller} />} />
           <Route path="/settings" element={<ProtectedRoute><LayoutUser Component={SettingPage} /></ProtectedRoute>} />
