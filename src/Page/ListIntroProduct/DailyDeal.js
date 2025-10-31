@@ -100,7 +100,7 @@ const DailyDeals = () => {
                 }}
               >
                 <img
-                  src={product.imageUrl || "/placeholder.png"}
+                  src={product.image_url || "/placeholder.png"}
                   alt={product.slug}
                   style={{
                     width: "100%",

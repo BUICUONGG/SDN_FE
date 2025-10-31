@@ -67,7 +67,7 @@ export default function DetailProduct() {
       id: product._id,
       name: product.productName || `Pin ${product.battery[0]?.name}`,
       price: product.price,
-      image: product.productImageUrl?.[0] || "/default-battery.jpg",
+      image: product.productimage_url?.[0] || "/default-battery.jpg",
       quantity: 1,
       variantId: product._id,
       shopId: product.creater,
@@ -82,7 +82,7 @@ export default function DetailProduct() {
       id: product._id,
       name: product.productName || `Pin ${product.battery[0]?.name}`,
       price: product.price,
-      image: product.productImageUrl?.[0] || "/default-battery.jpg",
+      image: product.productimage_url?.[0] || "/default-battery.jpg",
       quantity: 1,
       variantId: product._id,
       shopId: product.creater,
@@ -98,8 +98,8 @@ export default function DetailProduct() {
       .then((res) => {
         const data = res.data.product;
         setProduct(data);
-        if (data.productImageUrl?.length > 0) {
-          setSelectedImage(data.productImageUrl[0]);
+        if (data.productimage_url?.length > 0) {
+          setSelectedImage(data.productimage_url[0]);
         }
       })
       .catch((err) => console.error("Lỗi lấy sản phẩm:", err))
@@ -244,7 +244,7 @@ export default function DetailProduct() {
                 paddingBottom: "8px",
               }}
             >
-              {(product.productImageUrl || []).slice(startIndex, startIndex + maxThumbnails).map((img, idx) => (
+              {(product.productimage_url || []).slice(startIndex, startIndex + maxThumbnails).map((img, idx) => (
                 <img
                   key={idx}
                   src={img}

@@ -217,7 +217,7 @@ const CarouselIntro = () => {
                   cover={
                     <div style={{ position: "relative", paddingTop: "100%" }}>
                       <img
-                        src={product.imageUrl}
+                        src={product.image_url}
                         alt={product.title}
                         style={{
                           position: "absolute",

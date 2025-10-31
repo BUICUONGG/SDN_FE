@@ -88,7 +88,7 @@ export default function AllProduct() {
       key: "name",
       render: (text, record) => (
         <Space>
-          <img src={record.imageUrl || "https://via.placeholder.com/60"} alt="product" width={40} />
+          <img src={record.image_url || "https://via.placeholder.com/60"} alt="product" width={40} />
           <span>{text}</span>
         </Space>
       ),

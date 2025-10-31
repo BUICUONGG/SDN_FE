@@ -97,7 +97,7 @@ export default function DetailProduct() {
         >
           {/* Bấm vào ảnh đại diện sẽ mở modal chứa nhiều ảnh */}
           <img
-            src={stores?.productImageUrl?.[0]}
+            src={stores?.productimage_url?.[0]}
             alt="product"
             onClick={handleOpenModal}
             style={{
@@ -154,7 +154,7 @@ export default function DetailProduct() {
       >
         <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
           <Image.PreviewGroup>
-            {stores?.productImageUrl?.map((url, index) => (
+            {stores?.productimage_url?.map((url, index) => (
               <Image
                 key={index}
                 src={url}
