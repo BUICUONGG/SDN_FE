@@ -53,8 +53,8 @@ export default function FooterPage() {
           }}
         >
           <div style={{ flex: 1 }}>
-            <h1 style={{ fontSize: "70px" }} className="font-xmark">
-              xmark
+            <h1 style={{ fontSize: "70px" }} className="font-V I N E">
+              V I N E
             </h1>
             <p>
               <FaPhone /> Tổng đài CSKH: 0946744287
@@ -62,14 +62,14 @@ export default function FooterPage() {
             <p>
               <FaEnvelope /> Email: namtran34311@gmail.com
             </p>
-            <h6>Theo dõi xmark</h6>
+            <h6>Theo dõi V I N E</h6>
             <p>
               <a href="https://www.facebook.com/profile.php?id=61574917165179" target="_blank" rel="noopener noreferrer" style={{ color: "white", textDecoration: "none" }}>
                 <FaFacebook /> Facebook
               </a>
             </p>
             <p>
-              <a href="https://www.instagram.com/xmark_2hand/" target="_blank" rel="noopener noreferrer" style={{ color: "white", textDecoration: "none" }}>
+              <a href="https://www.instagram.com/V I N E_2hand/" target="_blank" rel="noopener noreferrer" style={{ color: "white", textDecoration: "none" }}>
                 <FaInstagram /> Instagram
               </a>
             </p>
@@ -85,7 +85,7 @@ export default function FooterPage() {
           </div>
 
           <div style={{ flex: 1 }}>
-            <h5>Về xmark</h5>
+            <h5>Về V I N E</h5>
             <p>Câu chuyện thương hiệu</p>
             <p>Giá trị cốt lõi</p>
             <p>Trách nhiệm cộng đồng</p>
@@ -104,16 +104,16 @@ export default function FooterPage() {
           }}
         >
           <div style={{ flex: 1 }}>
-            <h1 style={{ fontSize: "50px" }} className="font-xmark">
-              xmark
+            <h1 style={{ fontSize: "50px" }} className="font-V I N E">
+              V I N E
             </h1>
             <p>
               <FaPhone /> Tổng đài CSKH: 0829982028
             </p>
             <p>
-              <FaEnvelope /> Email: cskh@xmark.com
+              <FaEnvelope /> Email: cskh@V I N E.com
             </p>
-            <h6>Theo dõi xmark</h6>
+            <h6>Theo dõi V I N E</h6>
             <p>
               <FaFacebook /> Facebook
             </p>
@@ -132,7 +132,7 @@ export default function FooterPage() {
           </div>
 
           <div style={{ flex: 1 }}>
-            <h5>Về xmark</h5>
+            <h5>Về V I N E</h5>
             <p>Câu chuyện thương hiệu</p>
             <p>Giá trị cốt lõi</p>
             <p>Trách nhiệm cộng đồng</p>
@@ -151,16 +151,16 @@ export default function FooterPage() {
           }}
         >
           <div style={{ flex: 1 }}>
-            <h1 style={{ fontSize: "70px" }} className="font-xmark">
-              xmark
+            <h1 style={{ fontSize: "70px" }} className="font-V I N E">
+              V I N E
             </h1>
             <p>
               <FaPhone /> Tổng đài CSKH: 0829982028
             </p>
             <p>
-              <FaEnvelope /> Email: cskh@xmark.com
+              <FaEnvelope /> Email: cskh@V I N E.com
             </p>
-            <h6>Theo dõi xmark</h6>
+            <h6>Theo dõi V I N E</h6>
             <p>
               <FaFacebook /> Facebook
             </p>
@@ -181,16 +181,16 @@ export default function FooterPage() {
           }}
         >
           <div style={{ flex: 1 }}>
-            <h1 style={{ fontSize: "70px" }} className="font-xmark">
-              xmark
+            <h1 style={{ fontSize: "70px" }} className="font-V I N E">
+              V I N E
             </h1>
             <p>
               <FaPhone /> Tổng đài CSKH: 0829982028
             </p>
             <p>
-              <FaEnvelope /> Email: cskh@xmark.com
+              <FaEnvelope /> Email: cskh@V I N E.com
             </p>
-            <h6>Theo dõi xmark</h6>
+            <h6>Theo dõi V I N E</h6>
             <p>
               <FaFacebook /> Facebook
             </p>

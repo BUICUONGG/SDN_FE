@@ -48,14 +48,14 @@ export default function AdminPage() {
     } else {
       try {
         const loginData = {
-          email: email,
+          username: email,
           password: pass,
         };
         setLoading(true);
         console.log(loginData)
         const res = await userService.postLogin(loginData);
         console.log("Kết quả đăng nhập:", res);
-        if (res.data.status === true && res.data.metadata) {
+        if (res.data) {
           localUserService.set(res.data);
           localStorage.setItem("token", "your_jwt_token");
           setTimeout(() => {
@@ -70,7 +70,7 @@ export default function AdminPage() {
       } catch (err) {
         console.error("Lỗi đăng nhập:", err);
         setTimeout(() => {
-          openNotification("error", "Lỗi", err.response?.data?.metadata.message);
+          openNotification("error", "Lỗi", err.response?.data?.message);
           setLoading(false);
         }, 1500);
       }

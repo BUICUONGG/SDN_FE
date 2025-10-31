@@ -161,6 +161,10 @@ export default function HeaderPage() {
     }
   };
 
+  const handleDg =() =>{
+    navigate("/auction-channel");
+  }
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
@@ -204,7 +208,10 @@ export default function HeaderPage() {
         </span>
         <span style={{ cursor: "pointer" }}> Đóng góp ý kiến</span>
         <span style={{ cursor: "pointer" }}> Hỗ trợ</span>
-        <span style={{ cursor: "pointer" }}> Kênh đấu giá</span>
+        <span onClick={handleDg} style={{ cursor: "pointer" }}>
+          {" "}
+          Kênh đấu giá
+        </span>
         <span style={{ cursor: "pointer" }}> Thay đổi ngôn ngữ</span>
       </div>
 
@@ -236,7 +243,7 @@ export default function HeaderPage() {
               fontWeight: "500",
               transition: "font-size 0.3s ease-in-out",
             }}
-            href="/home"
+            href="/"
           >
             <span className="font-xmark">V I N E</span>
           </a>

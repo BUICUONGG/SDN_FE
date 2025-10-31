@@ -1,7 +1,8 @@
 import axios from "axios";
 import { localUserService } from "./localService";
 
-export const BASE_URL = process.env.REACT_APP_BASE_URL;
+export const BASE_URL = process.env.REACT_APP_BASE_URL2;
+export const BASE_URL2 = process.env.REACT_APP_BASE_URL2;
 
 export const configHeader = () => {
     const accessToken = localUserService.getAccessToken();
@@ -11,8 +12,6 @@ export const configHeader = () => {
     };
 };
 
-
-console.log(localUserService.getAccessToken())
 
 // Tạo Axios instance
 export const https = axios.create({

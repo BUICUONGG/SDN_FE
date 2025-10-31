@@ -1,5 +1,4 @@
 import { https } from "./config";
-import { localUserService } from "./localService";
 
 export const appService = {
   postDataUser: () => {
@@ -43,9 +42,6 @@ export const appService = {
     return https.get("/product-service/api/v1/categories");
   },
 
-  getAllBrand: () => {
-    return https.get("/product-service/api/v1/brands");
-  },
 
   getSubCate: (id) => {
     return https.get(`/product-service/api/v1/categories/${id}/sub-categories`);
@@ -62,15 +58,30 @@ export const appService = {
     );
   },
 
+  getAllUser: () => https.get("/user"),
+  updateUser: (id, data) => https.put(`/user/${id}`, data),
+  deleteUser: (id) => https.delete(`/user/${id}`),
+  getAllReviews: () => https.get("/review"),
+  getAllBrands: () => https.get("/brand"),
+  getAllCategories: () => https.get("/category"),
+  updateProduct: (id, data) => {
+    return https.put(`/product/${id}`, data);
+  },
   getDetailProduct: (id) => {
-    return https.get(`/product-service/api/v1/products/${id}`);
+    return https.get(`/product/${id}`);
+  },
+  getAllProduct: () => {
+    return https.get(`/product`);
   },
 
-  getAllProduct: (page, pageSize) => {
-    return https.get(
-      `/product-service/api/v1/products?currentPage=${page}&pageSize=${pageSize}`
-    );
-  },
+  createBrand: (data) => https.post(`/brand`, data),
+  updateBrand: (id, data) => https.put(`/brand/${id}`, data),
+  deleteBrand: (id) => https.delete(`/brand/${id}`),
+  createCategory: (data) => https.post(`/category`, data),
+  updateCategory: (id, data) => https.put(`/category/${id}`, data),
+  deleteCategory: (id) => https.delete(`/category/${id}`),
+
+
 
   searchProducts: (criteria) => {
     return https.get("/product-service/api/v1/products", {
@@ -161,4 +172,13 @@ export const appService = {
     return https.post(`/order-service/api/v1/momo`, { orderId });
   },
 
+
+
+  createReview: (data)  => {
+    console.log(data)
+    return https.post("/review", data)
+  },
+
+  updateReview: (id, data) => https.put(`/reviews/${id}`, data), // API sửa
+  deleteReview: (id) => https.delete(`/reviews/${id}`),
 };

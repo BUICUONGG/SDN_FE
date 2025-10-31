@@ -125,7 +125,7 @@ export default function ModalUser({ isOpen, onClose }) {
       setErrorModal(true); // Hiển thị modal lỗi
       setTimeout(() => setErrorModal(false), 3000); // Tự động đóng sau 3 giây
       // setZaloModal(true);
-    }else if(mailValidation.isValid){
+    } else if (mailValidation.isValid) {
       setErrMessage("mail");
       setErrorModal(true); // Hiển thị modal lỗi
       setTimeout(() => setErrorModal(false), 3000); // Tự động đóng sau 3 giây
@@ -136,8 +136,6 @@ export default function ModalUser({ isOpen, onClose }) {
       setTimeout(() => setErrorModal(false), 3000); // Tự động đóng sau 3 giây
     }
   };
-
-
 
   const handleRePass = () => {
     const emailValidation = validateEmail(email);
@@ -180,28 +178,31 @@ export default function ModalUser({ isOpen, onClose }) {
     } else {
       try {
         const loginData = {
-          email: email,
+          username: email,
           password: pass,
         };
         setLoading(true);
+        console.log(loginData);
         const res = await userService.postLogin(loginData);
-
-        if (res.data.status === true && res.data.metadata) {
-          localUserService.set(res.data);
-          localStorage.setItem("token", "your_jwt_token");
-          setTimeout(() => {
-            openNotification("success", "Thành công", "Đăng nhập thành công!");
-          }, 1000);
-          setTimeout(() => {
-            dispatch(setLoginAction(res.data));
-            setLoading(false);
-            window.location.reload();
-          }, 1500);
-        }
+        console.log(res);
+        localUserService.set(res.data);
+        localStorage.setItem("token", "your_jwt_token");
+        setTimeout(() => {
+          openNotification("success", "Thành công", "Đăng nhập thành công!");
+        }, 1000);
+        setTimeout(() => {
+          dispatch(setLoginAction(res.data));
+          setLoading(false);
+          // window.location.reload();
+        }, 1500);
       } catch (err) {
         console.error("Lỗi đăng nhập:", err);
         setTimeout(() => {
-          openNotification("error", "Lỗi", err?.response?.data?.metadata?.message);
+          openNotification(
+            "error",
+            "Lỗi",
+            err?.response?.data?.metadata?.message
+          );
           setLoading(false);
         }, 1500);
       }
@@ -211,7 +212,7 @@ export default function ModalUser({ isOpen, onClose }) {
   const handleSignUp = async () => {
     const valiPass = validatePass(pass);
     const valiEmail = validateEmail(email);
-    if (!email || !pass || !pass2 || !phoneNumber) {
+    if (!email || !pass || !pass2) {
       openNotification(
         "error",
         "Lỗi",
@@ -241,33 +242,36 @@ export default function ModalUser({ isOpen, onClose }) {
     }
     try {
       const signupForm = {
-        email: email,
-        phone: phoneNumber,
+        username: email,
         password: pass,
-        confirmPassword: pass2,
       };
       const res = await userService.postSignUp(signupForm);
       setLoading(true);
+      console.log(res);
       setTimeout(() => {
-        setIsXT(true);
         setLoading(false);
+        openNotification(
+          "success",
+          "Thành công",
+          "Đăng ký thành công!"
+        );
       }, 700);
       handleRePass();
     } catch (err) {
       console.error("Lỗi đăng Ký:", err);
       const errorMeta = err.response?.data?.metadata;
-        let errorMessage = '';
-        if (Array.isArray(errorMeta)) {
-          errorMessage = errorMeta.map((item) => item.message).join("\n");
-        } else if (typeof errorMeta === "object" && errorMeta?.message) {
-          errorMessage = errorMeta.message;
-        } else if (typeof errorMeta === "string") {
-          errorMessage = errorMeta;
-        } else {
-          errorMessage = "Đã xảy ra lỗi không xác định";
-        }
+      let errorMessage = "";
+      if (Array.isArray(errorMeta)) {
+        errorMessage = errorMeta.map((item) => item.message).join("\n");
+      } else if (typeof errorMeta === "object" && errorMeta?.message) {
+        errorMessage = errorMeta.message;
+      } else if (typeof errorMeta === "string") {
+        errorMessage = errorMeta;
+      } else {
+        errorMessage = "Đã xảy ra lỗi không xác định";
+      }
 
-        openNotification("error", "Thất bại", errorMessage);
+      openNotification("error", "Thất bại", errorMessage);
     }
   };
 
@@ -276,8 +280,7 @@ export default function ModalUser({ isOpen, onClose }) {
       message.error("Vui lòng nhập email!");
       return;
     }
-    
-    
+
     try {
       const res = await appService.resetPassword(email);
       openNotification(
@@ -290,18 +293,18 @@ export default function ModalUser({ isOpen, onClose }) {
       setCountDown(12);
     } catch (err) {
       const errorMeta = err.response?.data?.metadata;
-        let errorMessage = '';
-        if (Array.isArray(errorMeta)) {
-          errorMessage = errorMeta.map((item) => item.message).join("\n");
-        } else if (typeof errorMeta === "object" && errorMeta?.message) {
-          errorMessage = errorMeta.message;
-        } else if (typeof errorMeta === "string") {
-          errorMessage = errorMeta;
-        } else {
-          errorMessage = "Đã xảy ra lỗi không xác định";
-        }
+      let errorMessage = "";
+      if (Array.isArray(errorMeta)) {
+        errorMessage = errorMeta.map((item) => item.message).join("\n");
+      } else if (typeof errorMeta === "object" && errorMeta?.message) {
+        errorMessage = errorMeta.message;
+      } else if (typeof errorMeta === "string") {
+        errorMessage = errorMeta;
+      } else {
+        errorMessage = "Đã xảy ra lỗi không xác định";
+      }
 
-        openNotification("error", "Thất bại", errorMessage);
+      openNotification("error", "Thất bại", errorMessage);
     }
   };
 
@@ -330,18 +333,18 @@ export default function ModalUser({ isOpen, onClose }) {
     } catch (error) {
       console.log(error.response.data.metadata);
       const errorMeta = error.response?.data?.metadata;
-        let errorMessage = '';
-        if (Array.isArray(errorMeta)) {
-          errorMessage = errorMeta.map((item) => item.message).join("\n");
-        } else if (typeof errorMeta === "object" && errorMeta?.message) {
-          errorMessage = errorMeta.message;
-        } else if (typeof errorMeta === "string") {
-          errorMessage = errorMeta;
-        } else {
-          errorMessage = "Đã xảy ra lỗi không xác định";
-        }
+      let errorMessage = "";
+      if (Array.isArray(errorMeta)) {
+        errorMessage = errorMeta.map((item) => item.message).join("\n");
+      } else if (typeof errorMeta === "object" && errorMeta?.message) {
+        errorMessage = errorMeta.message;
+      } else if (typeof errorMeta === "string") {
+        errorMessage = errorMeta;
+      } else {
+        errorMessage = "Đã xảy ra lỗi không xác định";
+      }
 
-        openNotification("error", "Thất bại", errorMessage);
+      openNotification("error", "Thất bại", errorMessage);
     }
   };
 
@@ -409,9 +412,9 @@ export default function ModalUser({ isOpen, onClose }) {
   const content = <div style={contentStyle} />;
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://thanhnt-tech.id.vn/user-service/api/v1/account/login/google";
+    window.location.href =
+      "http://thanhnt-tech.id.vn/user-service/api/v1/account/login/google";
   };
-
 
   if (!isOpen) return null;
 
@@ -502,26 +505,48 @@ export default function ModalUser({ isOpen, onClose }) {
 
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
+                display: "flex",
+                alignItems: "center",
               }}
             >
-            <div className="divider">
-            </div>
-            <div style={{ display: 'block', margin: '0 5%'}}>
-              Hoặc
-            </div>
-            <div className="divider">
-            </div>
+              <div className="divider"></div>
+              <div style={{ display: "block", margin: "0 5%" }}>Hoặc</div>
+              <div className="divider"></div>
             </div>
 
             {/* Nút đăng nhập với Google và Facebook */}
-            <div style={{ display: "flex", justifyContent: "center", gap: "10%", marginBottom: '10px' }}>
-  
-              <img src={gg} alt="Google" style={{ width: "32px", cursor: 'pointer' }} onClick={handleGoogleLogin}/>
-              <FaFacebook style={{fontSize: '32px', color: '#0866ff', cursor: 'pointer'}}/>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: "10%",
+                marginBottom: "10px",
+              }}
+            >
+              <img
+                src={gg}
+                alt="Google"
+                style={{ width: "32px", cursor: "pointer" }}
+                onClick={handleGoogleLogin}
+              />
+              <FaFacebook
+                style={{
+                  fontSize: "32px",
+                  color: "#0866ff",
+                  cursor: "pointer",
+                }}
+              />
             </div>
-            <p style={{ textAlign: "left", marginTop: "5%", fontSize: "12px", color: "black", fontWeight: '400', textAlign: 'center' }}>
+            <p
+              style={{
+                textAlign: "left",
+                marginTop: "5%",
+                fontSize: "12px",
+                color: "black",
+                fontWeight: "400",
+                textAlign: "center",
+              }}
+            >
               Bạn mới biết đến xmark lần đầu?{" "}
               <span
                 onClick={() => setIsDK(true)}
@@ -535,21 +560,51 @@ export default function ModalUser({ isOpen, onClose }) {
               </span>
             </p>
             <div style={{ display: "flex", justifyContent: "center" }}>
-              <div style={{width: '50%'}}>
+              <div style={{ width: "50%" }}>
                 <img src={rt} alt="Google" style={{ width: "50%" }} />
-                <p style={{color: 'black', fontSize: '12px', fontWeight: '400', margin: '0'}}>FREE RETURN </p>
+                <p
+                  style={{
+                    color: "black",
+                    fontSize: "12px",
+                    fontWeight: "400",
+                    margin: "0",
+                  }}
+                >
+                  FREE RETURN{" "}
+                </p>
               </div>
-              <div style={{width: '50%'}}>
+              <div style={{ width: "50%" }}>
                 <img src={sb} alt="Google" style={{ width: "50%" }} />
-                <p style={{color: 'black', fontSize: '12px', fontWeight: '400', margin: '0'}}>SAFE SHOPPING</p>
+                <p
+                  style={{
+                    color: "black",
+                    fontSize: "12px",
+                    fontWeight: "400",
+                    margin: "0",
+                  }}
+                >
+                  SAFE SHOPPING
+                </p>
               </div>
             </div>
-            <p style={{
-              color: 'black',
-              fontSize: '12px',
-              fontWeight: '400',
-              margin: '20px 0',
-            }}>By continuing, you agree to our <span style={{textDecoration: 'underline', cursor: 'pointer'}}>Terms of Use</span> and <span style={{textDecoration: 'underline', cursor: 'pointer'}}>Privacy Policy</span>.</p>
+            <p
+              style={{
+                color: "black",
+                fontSize: "12px",
+                fontWeight: "400",
+                margin: "20px 0",
+              }}
+            >
+              By continuing, you agree to our{" "}
+              <span style={{ textDecoration: "underline", cursor: "pointer" }}>
+                Terms of Use
+              </span>{" "}
+              and{" "}
+              <span style={{ textDecoration: "underline", cursor: "pointer" }}>
+                Privacy Policy
+              </span>
+              .
+            </p>
           </div>
         </div>
       )}
@@ -584,14 +639,6 @@ export default function ModalUser({ isOpen, onClose }) {
               placeholder="Email người dùng"
             />
 
-            <label>Số điện thoại</label>
-            <input
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              value={phoneNumber}
-              type="text"
-              placeholder="Số điện thoại"
-            />
-
             <label>Mật khẩu</label>
             <div className="password-container">
               <input
@@ -623,32 +670,58 @@ export default function ModalUser({ isOpen, onClose }) {
                 {showRePassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
-            <button onClick={handleSignUp} className="login-button" style={{marginTop:'10px'}}>
+            <button
+              onClick={handleSignUp}
+              className="login-button"
+              style={{ marginTop: "10px" }}
+            >
               ĐĂNG Ký
             </button>
 
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
+                display: "flex",
+                alignItems: "center",
               }}
             >
-            <div className="divider">
-            </div>
-            <div style={{ display: 'block', margin: '0 5%'}}>
-              Hoặc
-            </div>
-            <div className="divider">
-            </div>
+              <div className="divider"></div>
+              <div style={{ display: "block", margin: "0 5%" }}>Hoặc</div>
+              <div className="divider"></div>
             </div>
 
             {/* Nút đăng nhập với Google và Facebook */}
-            <div style={{ display: "flex", justifyContent: "center", gap: "10%", marginBottom: '10px' }}>
-  
-              <img src={gg} alt="Google" style={{ width: "32px", cursor: 'pointer' }} onClick={handleGoogleLogin}/>
-              <FaFacebook style={{fontSize: '32px', color: '#0866ff', cursor: 'pointer'}}/>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: "10%",
+                marginBottom: "10px",
+              }}
+            >
+              <img
+                src={gg}
+                alt="Google"
+                style={{ width: "32px", cursor: "pointer" }}
+                onClick={handleGoogleLogin}
+              />
+              <FaFacebook
+                style={{
+                  fontSize: "32px",
+                  color: "#0866ff",
+                  cursor: "pointer",
+                }}
+              />
             </div>
-            <p style={{ textAlign: "left", marginTop: "5%", fontSize: "12px", color: "black", fontWeight: '400', textAlign: 'center' }}>
+            <p
+              style={{
+                textAlign: "left",
+                marginTop: "5%",
+                fontSize: "12px",
+                color: "black",
+                fontWeight: "400",
+                textAlign: "center",
+              }}
+            >
               Bạn đã có tài khoản?{" "}
               <span
                 onClick={() => {
@@ -663,22 +736,37 @@ export default function ModalUser({ isOpen, onClose }) {
                 Đăng nhập
               </span>
             </p>
-            
-            <p style={{
-              color: 'black',
-              fontSize: '12px',
-              fontWeight: '400',
-              margin: '20px 0',
-            }}>By continuing, you agree to our <span style={{textDecoration: 'underline', cursor: 'pointer'}}>Terms of Use</span> and <span style={{textDecoration: 'underline', cursor: 'pointer'}}>Privacy Policy</span>.</p>
+
+            <p
+              style={{
+                color: "black",
+                fontSize: "12px",
+                fontWeight: "400",
+                margin: "20px 0",
+              }}
+            >
+              By continuing, you agree to our{" "}
+              <span style={{ textDecoration: "underline", cursor: "pointer" }}>
+                Terms of Use
+              </span>{" "}
+              and{" "}
+              <span style={{ textDecoration: "underline", cursor: "pointer" }}>
+                Privacy Policy
+              </span>
+              .
+            </p>
           </div>
         </div>
       )}
 
       {/* quen mk */}
       {isRP && !isOtp && !isSms && !isNewPass && (
-        <div style={{
-          padding: '3%',
-        }} className="modal-container">
+        <div
+          style={{
+            padding: "3%",
+          }}
+          className="modal-container"
+        >
           {/* Nút đóng */}
           <button
             style={{
@@ -695,11 +783,16 @@ export default function ModalUser({ isOpen, onClose }) {
           </button>
 
           {/* Tiêu đề */}
-          <h2 style={{
-            fontSize: "34px",
-            fontWeight: "400",
-            marginBottom: "5%",
-          }} className="modal-title">Đặt lại mật khẩu</h2>
+          <h2
+            style={{
+              fontSize: "34px",
+              fontWeight: "400",
+              marginBottom: "5%",
+            }}
+            className="modal-title"
+          >
+            Đặt lại mật khẩu
+          </h2>
 
           {/* Form nhập thông tin */}
           <div className="modal-body">
@@ -717,7 +810,7 @@ export default function ModalUser({ isOpen, onClose }) {
               onClick={() => {
                 handleResetPassword();
               }}
-              style={{marginTop:'10px'}}
+              style={{ marginTop: "10px" }}
             >
               TIẾP TỤC
             </button>
@@ -739,7 +832,7 @@ export default function ModalUser({ isOpen, onClose }) {
             />
             <a
               onClick={() => setIsRP(false)}
-              style={{ 
+              style={{
                 cursor: "pointer",
                 position: "absolute",
                 top: "-100%",
@@ -747,10 +840,12 @@ export default function ModalUser({ isOpen, onClose }) {
               }}
               className="forgot-password"
             >
-              <IoIosArrowRoundBack style={{
-                fontSize: "25px",
-                color: "#1A81FF",
-              }}/>
+              <IoIosArrowRoundBack
+                style={{
+                  fontSize: "25px",
+                  color: "#1A81FF",
+                }}
+              />
             </a>
           </div>
         </div>
@@ -758,9 +853,12 @@ export default function ModalUser({ isOpen, onClose }) {
 
       {/* Màn hình nhập số điện thoại (SMS) */}
       {isSms && !isOtp && (
-        <div style={{
-          padding: "3%",
-        }} className="modal-container">
+        <div
+          style={{
+            padding: "3%",
+          }}
+          className="modal-container"
+        >
           {/* Nút đóng */}
           <button
             style={{
@@ -770,7 +868,6 @@ export default function ModalUser({ isOpen, onClose }) {
               border: "none",
               background: "none",
               fontSize: "25px",
-              
             }}
             onClick={handleOnclose}
           >
@@ -778,9 +875,14 @@ export default function ModalUser({ isOpen, onClose }) {
           </button>
 
           {/* Tiêu đề */}
-          <h2 style={{
-            color: 'black'
-          }} className="modal-title">ĐĂNG NHẬP</h2>
+          <h2
+            style={{
+              color: "black",
+            }}
+            className="modal-title"
+          >
+            ĐĂNG NHẬP
+          </h2>
 
           {/* Form nhập thông tin */}
           <div className="modal-body">
@@ -790,13 +892,17 @@ export default function ModalUser({ isOpen, onClose }) {
               type="text"
               placeholder="Email hoặc số điện thoại"
             />
-            <button className="login-button" onClick={handleOtp} style={{marginTop:'10px'}}>
+            <button
+              className="login-button"
+              onClick={handleOtp}
+              style={{ marginTop: "10px" }}
+            >
               TIẾP TỤC
             </button>
 
             {errorModal && (
               <div className="error-modal">
-                <p style={{color: 'red'}}>{errMessage}</p>
+                <p style={{ color: "red" }}>{errMessage}</p>
               </div>
             )}
             <ZaloModal
@@ -811,9 +917,7 @@ export default function ModalUser({ isOpen, onClose }) {
             />
             <a
               onClick={() => setIsSms(false)}
-              style={{ cursor: "pointer",
-                color: "#1A81FF",
-               }}
+              style={{ cursor: "pointer", color: "#1A81FF" }}
               className="forgot-password"
             >
               Đăng nhập bằng mật khẩu
@@ -821,32 +925,54 @@ export default function ModalUser({ isOpen, onClose }) {
 
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
+                display: "flex",
+                alignItems: "center",
               }}
             >
-            <div className="divider">
+              <div className="divider"></div>
+              <div style={{ display: "block", margin: "0 5%" }}>Hoặc</div>
+              <div className="divider"></div>
             </div>
-            <div style={{ display: 'block', margin: '0 5%'}}>
-              Hoặc
-            </div>
-            <div className="divider">
-            </div>
-            </div>
-            
 
             {/* Nút đăng nhập với Google và Facebook */}
-            <div style={{ display: "flex", justifyContent: "center", gap: "10%", marginBottom: '10px' }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: "10%",
+                marginBottom: "10px",
+              }}
+            >
+              <img
+                src={gg}
+                alt="Google"
+                style={{ width: "32px", cursor: "pointer" }}
+                onClick={handleGoogleLogin}
+              />
 
-              <img src={gg} alt="Google" style={{ width: "32px", cursor: 'pointer' }} onClick={handleGoogleLogin}/>
-              
-              <FaFacebook style={{fontSize: '32px', color: '#0866ff', cursor: 'pointer'}}/>
+              <FaFacebook
+                style={{
+                  fontSize: "32px",
+                  color: "#0866ff",
+                  cursor: "pointer",
+                }}
+              />
             </div>
-            <p style={{ textAlign: "left", marginTop: "5%", fontSize: "12px", color: "black", fontWeight: '400', textAlign: 'center' }}>
+            <p
+              style={{
+                textAlign: "left",
+                marginTop: "5%",
+                fontSize: "12px",
+                color: "black",
+                fontWeight: "400",
+                textAlign: "center",
+              }}
+            >
               Bạn mới biết đến xmark lần đầu?{" "}
               <span
-                onClick={() => {setIsDK(true)
-                setIsSms(false);
+                onClick={() => {
+                  setIsDK(true);
+                  setIsSms(false);
                 }}
                 style={{
                   color: "#1A81FF",
@@ -858,32 +984,63 @@ export default function ModalUser({ isOpen, onClose }) {
               </span>
             </p>
             <div style={{ display: "flex", justifyContent: "center" }}>
-              <div style={{width: '50%'}}>
+              <div style={{ width: "50%" }}>
                 <img src={rt} alt="Google" style={{ width: "50%" }} />
-                <p style={{color: 'black', fontSize: '12px', fontWeight: '400', margin: '0'}}>FREE RETURN </p>
+                <p
+                  style={{
+                    color: "black",
+                    fontSize: "12px",
+                    fontWeight: "400",
+                    margin: "0",
+                  }}
+                >
+                  FREE RETURN{" "}
+                </p>
               </div>
-              <div style={{width: '50%'}}>
+              <div style={{ width: "50%" }}>
                 <img src={sb} alt="Google" style={{ width: "50%" }} />
-                <p style={{color: 'black', fontSize: '12px', fontWeight: '400', margin: '0'}}>SAFE SHOPPING</p>
+                <p
+                  style={{
+                    color: "black",
+                    fontSize: "12px",
+                    fontWeight: "400",
+                    margin: "0",
+                  }}
+                >
+                  SAFE SHOPPING
+                </p>
               </div>
             </div>
-            <p style={{
-              color: 'black',
-              fontSize: '12px',
-              fontWeight: '400',
-              margin: '20px 0',
-            }}>By continuing, you agree to our <span style={{textDecoration: 'underline', cursor: 'pointer'}}>Terms of Use</span> and <span style={{textDecoration: 'underline', cursor: 'pointer'}}>Privacy Policy</span>.</p>
+            <p
+              style={{
+                color: "black",
+                fontSize: "12px",
+                fontWeight: "400",
+                margin: "20px 0",
+              }}
+            >
+              By continuing, you agree to our{" "}
+              <span style={{ textDecoration: "underline", cursor: "pointer" }}>
+                Terms of Use
+              </span>{" "}
+              and{" "}
+              <span style={{ textDecoration: "underline", cursor: "pointer" }}>
+                Privacy Policy
+              </span>
+              .
+            </p>
           </div>
         </div>
       )}
 
       {/* Màn hình nhập OTP */}
       {isOtp && (
-        <div style={
-          {
+        <div
+          style={{
             padding: "3%",
-          }
-        } className="modal-container">
+          }}
+          className="modal-container"
+        >
           {/* Nút đóng */}
           <button
             style={{
@@ -900,14 +1057,25 @@ export default function ModalUser({ isOpen, onClose }) {
           </button>
 
           {/* Tiêu đề */}
-          <h2 style={{
-            fontSize: "34px",
-          }} className="modal-title">Mã OTP</h2>
+          <h2
+            style={{
+              fontSize: "34px",
+            }}
+            className="modal-title"
+          >
+            Mã OTP
+          </h2>
           <p
             className="otp-message"
-            style={{ color: "black", fontWeight: "500" , fontSize: '12px', padding: '0 5%'}}
+            style={{
+              color: "black",
+              fontWeight: "500",
+              fontSize: "12px",
+              padding: "0 5%",
+            }}
           >
-            Chúng tôi đã gửi mã xác thực OTP đến email của bạn. Vui lòng kiểm tra hộp thư đến (hoặc thư rác) và nhập mã để tiếp tục. <br />
+            Chúng tôi đã gửi mã xác thực OTP đến email của bạn. Vui lòng kiểm
+            tra hộp thư đến (hoặc thư rác) và nhập mã để tiếp tục. <br />
           </p>
 
           {/* Ô nhập mã OTP */}
@@ -926,11 +1094,16 @@ export default function ModalUser({ isOpen, onClose }) {
             ))}
           </div>
 
-          <button onClick={handleCfOtp} className="login-button" style={{marginTop:'5%',
-            marginBottom: "10%",
-            width: "80%",
-            padding: "10px",
-          }}>
+          <button
+            onClick={handleCfOtp}
+            className="login-button"
+            style={{
+              marginTop: "5%",
+              marginBottom: "10%",
+              width: "80%",
+              padding: "10px",
+            }}
+          >
             Xác nhận
           </button>
           <br />
@@ -1004,7 +1177,11 @@ export default function ModalUser({ isOpen, onClose }) {
             ))}
           </div>
 
-          <button onClick={handleXTOtp} className="login-button" style={{marginTop:'10px'}}>
+          <button
+            onClick={handleXTOtp}
+            className="login-button"
+            style={{ marginTop: "10px" }}
+          >
             TIẾP TỤC
           </button>
 
@@ -1076,10 +1253,14 @@ export default function ModalUser({ isOpen, onClose }) {
               </button>
             </div>
 
-            <button style={{
-              marginTop: "10%",
-              marginBottom: "10%",
-            }} onClick={handleChangePass} className="login-button">
+            <button
+              style={{
+                marginTop: "10%",
+                marginBottom: "10%",
+              }}
+              onClick={handleChangePass}
+              className="login-button"
+            >
               Thay đổi
             </button>
           </div>
