@@ -108,7 +108,7 @@ export default function InfoUser() {
       {/* Header */}
       <div className="header-intro">
         <div className="header-container">
-          <span className="font-xmark">xmark</span>
+          <span className="font-xmark">VINE</span>
           {(dt || ip) && (
             <div className="header-right">
             

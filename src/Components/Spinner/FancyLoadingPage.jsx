@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./FancyLoadingPage.css";
 import { BsCart, BsCartCheckFill } from "react-icons/bs";
-import { PiShirtFoldedFill } from "react-icons/pi";
+import { MdOutlineElectricCar } from "react-icons/md";
 
 export default function FancyLoadingPage() {
   const [showCheckedCart, setShowCheckedCart] = useState(false);
@@ -17,7 +17,7 @@ export default function FancyLoadingPage() {
   return (
     <div className="cart-animation-container">
       <div className="product-icon">
-        <PiShirtFoldedFill />
+        <MdOutlineElectricCar />
       </div>
 
       <div className="cart-icon">
@@ -28,7 +28,7 @@ export default function FancyLoadingPage() {
         )}
       </div>
 
-      <div className="xmark-text">xmark
+      <div className="xmark-text">VINE
         <span className="loading-dots"></span>
       </div>
 

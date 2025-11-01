@@ -547,7 +547,7 @@ export default function ModalUser({ isOpen, onClose }) {
                 textAlign: "center",
               }}
             >
-              Bạn mới biết đến xmark lần đầu?{" "}
+              Bạn mới biết đến VINE lần đầu?{" "}
               <span
                 onClick={() => setIsDK(true)}
                 style={{
@@ -968,7 +968,7 @@ export default function ModalUser({ isOpen, onClose }) {
                 textAlign: "center",
               }}
             >
-              Bạn mới biết đến xmark lần đầu?{" "}
+              Bạn mới biết đến VINE lần đầu?{" "}
               <span
                 onClick={() => {
                   setIsDK(true);

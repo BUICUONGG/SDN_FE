@@ -242,7 +242,7 @@ export default function UserLogin({ onLogin }) {
               </button>
             </div>
             <p style={{ textAlign: "left", marginTop: "5%", fontSize: "16px" }}>
-              Bạn mới biết đến xmark lần đầu?{" "}
+              Bạn mới biết đến VINE lần đầu?{" "}
               <span
                 //   onClick={() => setIsDK(true)}
                 style={{

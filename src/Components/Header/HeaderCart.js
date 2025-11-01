@@ -175,7 +175,7 @@ export default function HeaderCart() {
             }}
             href="/home"
           >
-            <span className="font-xmark">xmark</span>
+            <span className="font-xmark">VINE</span>
             <span style={{
               fontSize: "30px",
               marginLeft: "10%",
