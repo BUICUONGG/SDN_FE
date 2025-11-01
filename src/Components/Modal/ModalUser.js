@@ -412,8 +412,8 @@ export default function ModalUser({ isOpen, onClose }) {
   const content = <div style={contentStyle} />;
 
   const handleGoogleLogin = () => {
-    window.location.href =
-      "http://thanhnt-tech.id.vn/user-service/api/v1/account/login/google";
+    const backendURL = process.env.REACT_APP_BASE_URL2 || 'http://localhost:3000/api';
+    window.location.href = `${backendURL}/auth/google`;
   };
 
   if (!isOpen) return null;

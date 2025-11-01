@@ -127,6 +127,7 @@ function App() {
           <Route path="/" element={<Layout Component={HomePage} />} />
           <Route path="/auction-channel" element={<Layout Component={AutionPage} />} />
           <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
+          <Route path="/auth/google/callback" element={<OAuth2RedirectHandler />} />
           <Route path="/register-seller" element={<Layout Component={RegisterSeller} />} />
           <Route path="/settings" element={<ProtectedRoute><LayoutUser Component={SettingPage} /></ProtectedRoute>} />
           <Route path="/settings/address" element={<ProtectedRoute><LayoutUser Component={AddressPage} /></ProtectedRoute>} />
