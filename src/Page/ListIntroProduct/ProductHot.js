@@ -136,15 +136,16 @@ const ProductHot = () => {
                   actions={[<CameraOutlined key="view" />]}
                 >
                   <Meta
-                    title={product.name}
+                    title={product.battery.name}
+                    style={{ color: "orange" }}
                     description={`Tình trạng: ${
-                      product.productCondition || "N/A"
-                    }`}
+                      product.battery.healthPercentage || "N/A"
+                    }%`}
                   />
                   <p
                     style={{ color: "green", fontWeight: "bold", marginTop: 8 }}
                   >
-                    ₫{product.resalePrice?.toLocaleString("vi-VN") || "N/A"}
+                    ₫{product.price?.toLocaleString("vi-VN") || "N/A"}
                   </p>
                 </Card>
               </Col>

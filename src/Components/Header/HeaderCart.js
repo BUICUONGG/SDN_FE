@@ -142,7 +142,7 @@ export default function HeaderCart() {
         </span>
         <span style={{ cursor: "pointer" }}> Đóng góp ý kiến</span>
         <span style={{ cursor: "pointer" }}> Hỗ trợ</span>
-        <span style={{ cursor: "pointer" }}> Thay đổi ngôn ngữ</span>
+        {/* <span style={{ cursor: "pointer" }}> Thay đổi ngôn ngữ</span> */}
       </div>
 
       {/* Header chính */}

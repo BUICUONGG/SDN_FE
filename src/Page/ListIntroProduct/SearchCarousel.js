@@ -138,7 +138,7 @@ const SearchCarousel = () => {
             textOverflow: "ellipsis",
           }}
         >
-          {product.slug}
+          {product.battery.name}
         </div>
       }
       description={

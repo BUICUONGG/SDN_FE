@@ -212,7 +212,7 @@ export default function HeaderPage() {
           {" "}
           Kênh đấu giá
         </span>
-        <span style={{ cursor: "pointer" }}> Thay đổi ngôn ngữ</span>
+        {/* <span style={{ cursor: "pointer" }}> Thay đổi ngôn ngữ</span> */}
       </div>
 
       {/* Header chính */}
