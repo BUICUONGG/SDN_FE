@@ -19,7 +19,7 @@ export default function SellerPage() {
           color: "#333",
         }}
       >
-        Chào mừng đến với XMARK
+        Chào mừng đến với VINE
       </p>
       <p
         style={{

@@ -513,9 +513,9 @@ export default function PaymentTest() {
             <button>Áp dụng</button>
           </div>
           <div className="voucher-list">
-            <span>XMARK</span>
-            <span>XMARK</span>
-            <span>XMARK</span>
+            <span>VINE</span>
+            <span>VINE</span>
+            <span>VINE</span>
           </div>
 
           <div className="summary">

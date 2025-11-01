@@ -306,7 +306,7 @@ export default function RegisterSeller() {
           marginBottom: "2%",
         }}
       >
-        Đăng ký bán hàng với Xmark
+        Đăng ký bán hàng với VINE
       </h1>
       <div
         style={{
