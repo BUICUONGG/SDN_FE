@@ -90,7 +90,7 @@ const ProductLike = () => {
             >
               <img style={{
                 width: '100%'
-              }} src={product.imageUrl} alt="product" />
+              }} src={product.image_url[0]} alt="product" />
             </div>
 
             <div

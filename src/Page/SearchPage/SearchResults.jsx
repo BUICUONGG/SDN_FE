@@ -37,7 +37,7 @@ export default function SearchResults() {
       const mapped = data.map((p) => ({
         id: p.id,
         name: p.name,
-        imageUrl: p.imageUrl || p.image || '',
+        image_url: p.image_url[0] || p.image || '',
         price: p.resalePrice || p.discountedPrice || p.price || 0,
       }));
 
@@ -83,7 +83,7 @@ export default function SearchResults() {
       onClick={() => navigate(`/product/${product.id}`)}
      className="product-card" key={product.id}>
       <img
-        src={product.imageUrl}
+        src={product.image_url}
         alt={product.name}
         style={{
           width: "100%",

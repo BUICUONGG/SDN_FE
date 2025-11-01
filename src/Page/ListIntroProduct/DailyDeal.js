@@ -15,25 +15,13 @@ const DailyDeals = () => {
   const [loading, setLoading] = useState(false);
   const pageSize = 12;
   const navigate = useNavigate();
-  // State cho bộ đếm thời gian
-  const [timeLeft, setTimeLeft] = useState({
-    hours: 7,
-    minutes: 12,
-    seconds: 5,
-  });
 
-  const fetchProducts = async (page, tab) => {
-    setLoading(true);
+  const fetchProducts = async () => {
+    // setLoading(true);
     try {
-      const response = await appService.getAllProduct(page, pageSize);
-      let data = response?.data?.metadata?.metadata || [];
+      const response = await appService.getAllProduct();
+      let data = response?.data?.products || [];
 
-      // Nếu có tab lọc theo trạng thái
-      if (tab !== "Tất cả") {
-        data = data.filter((product) => product.status === tab);
-      }
-
-      // ⚠️ Chỉ lấy 6 sản phẩm đầu tiên
       setProducts(data.slice(0, 6));
 
       const total = response.data?.pagination?.totalElements || data.length;
@@ -46,14 +34,14 @@ const DailyDeals = () => {
   };
 
   useEffect(() => {
-    fetchProducts(currentPage, selectedTab);
-  }, [currentPage, selectedTab]);
+    fetchProducts();
+  }, []);
+
+  console.log(products);
 
   return (
     <div>
-      {loading && (
-        <FancyLoadingPage />
-      )}
+      {loading && <FancyLoadingPage />}
       {/* Tiêu đề */}
       <div style={{ marginBottom: "10px", textAlign: "center" }}>
         <h3
@@ -80,49 +68,98 @@ const DailyDeals = () => {
         <Carousel slidesToShow={6} dots={true}>
           {products.map((product) => (
             <Card
-              key={product.id}
-              onClick={() => navigate(`/product/${product.id}`)}
+              key={product._id}
               hoverable
+              onClick={() => navigate(`/product/${product._id}`)}
               style={{
-                width: 120,
-                textAlign: "center",
-                boxShadow: "1px 5px 8px rgba(0, 0, 0, 0.1)",
+                width: 240,
+                borderRadius: "12px",
+                overflow: "hidden",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                cursor: "pointer",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-4px)";
+                e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.15)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
               }}
             >
+              {/* Ảnh sản phẩm */}
               <div
                 style={{
-                  height: "250px", // hoặc tuỳ chỉnh
-                  background: "#f5f5f5",
+                  height: "180px",
+                  background: "#fafafa",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   overflow: "hidden",
-                  borderRadius: "8px"
                 }}
               >
                 <img
-                  src={product.imageUrl}
-                  alt={product.name}
+                  src={product.image_url[0] || "/placeholder.png"}
+                  alt={product.slug}
                   style={{
                     width: "100%",
                     height: "100%",
                     objectFit: "cover",
-                    objectPosition: "top",
-                    borderRadius: "6px"
+                    transition: "transform 0.3s ease",
                   }}
+                  onMouseOver={(e) =>
+                    (e.currentTarget.style.transform = "scale(1.05)")
+                  }
+                  onMouseOut={(e) =>
+                    (e.currentTarget.style.transform = "scale(1)")
+                  }
                 />
               </div>
-              <div style={{ padding: "10%" }}>
-                <Meta title={product.name} />
-                <div
-                  style={{
-                    marginTop: "10px",
-                  }}
-                >
-                  <div style={{ color: "green", fontWeight: "bold" }}>
-                    {product.resalePrice?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
-                  </div>
-                </div>
+
+              {/* Nội dung */}
+              <div style={{ padding: "12px 16px", textAlign: "left" }}>
+                <Meta
+                  title={
+                    <div
+                      style={{
+                        fontSize: "16px",
+                        fontWeight: 600,
+                        color: "#222",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {product.slug}
+                    </div>
+                  }
+                  description={
+                    <div style={{ marginTop: "8px" }}>
+                      <div
+                        style={{
+                          color: "#4CAF50",
+                          fontWeight: 700,
+                          fontSize: "15px",
+                        }}
+                      >
+                        {product.price?.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })}
+                      </div>
+                      <div
+                        style={{
+                          color: "#888",
+                          fontSize: "13px",
+                          marginTop: "4px",
+                        }}
+                      >
+                        {product.brand?.name || "Tesla"}
+                      </div>
+                    </div>
+                  }
+                />
               </div>
             </Card>
           ))}
@@ -132,13 +169,5 @@ const DailyDeals = () => {
   );
 };
 
-// Style cho đồng hồ đếm ngược
-const timerStyle = {
-  background: "#ddd",
-  padding: "5px 10px",
-  margin: "0 3px",
-  fontSize: "18px",
-  fontWeight: "bold",
-};
 
 export default DailyDeals;

@@ -313,7 +313,7 @@ export default function InvaSeller() {
                       <td style={tableTdStyle}>{item.productName}</td>
                       <td style={tableTdStyle}>
                         <img
-                          src={item.imageUrl}
+                          src={item.image_url[0]}
                           alt={item.productName}
                           style={{ width: 60, borderRadius: 4 }}
                         />

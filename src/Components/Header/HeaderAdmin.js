@@ -97,7 +97,7 @@ export default function HeaderAdmin() {
               fontWeight: "500",
               transition: "font-size 0.3s ease-in-out",
             }}
-            href="/home"
+            href="/"
           >
             <span className="font-xmark">V I N E</span>
           </a>

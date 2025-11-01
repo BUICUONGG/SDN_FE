@@ -1,9 +1,10 @@
 import axios from "axios";
-import { BASE_URL } from "./config";
+import { BASE_URL, BASE_URL2 } from "./config";
 
 export const userService = {
     postLogin: (loginForm) => {
-        return axios.post(`${BASE_URL}/user-service/api/v1/account/login`, loginForm, {
+        console.log(loginForm)
+        return axios.post(`${BASE_URL2}/login`, loginForm, {
             headers: {
                 "Content-Type": "application/json"
             }
@@ -11,7 +12,7 @@ export const userService = {
     },
 
     postSignUp: (signUpForm) => {
-        return axios.post(`${BASE_URL}/user-service/api/v1/account/signup`, signUpForm, {
+        return axios.post(`${BASE_URL2}/register`, signUpForm, {
             headers: {
                 "Content-Type": "application/json"
             }
