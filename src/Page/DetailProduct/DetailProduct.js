@@ -48,8 +48,6 @@ export default function DetailProduct() {
   const [editingReview, setEditingReview] = useState(null); // Review đang sửa
   const { addToCart } = useCart();
 
-  const [startIndex, setStartIndex] = useState(0);
-  const maxThumbnails = 6;
   const [api, contextHolder] = notification.useNotification();
   const navigate = useNavigate();
 
@@ -96,17 +94,11 @@ export default function DetailProduct() {
     appService
       .getDetailProduct(id)
       .then((res) => {
-        const data = res.data.product || {};
-        // Normalize image_url so downstream code can assume an array
-        const images = Array.isArray(data.image_url)
-          ? data.image_url
-          : data.image_url
-          ? [data.image_url]
-          : [];
-        const normalized = { ...data, image_url: images };
-        setProduct(normalized);
-        // set selected image to first image or a fallback placeholder
-        setSelectedImage(images[0] || "/default-battery.jpg");
+        const data = res.data.product;
+        setProduct(data);
+        if (data.image_url?.length > 0) {
+          setSelectedImage(data.image_url[0]);
+        }
       })
       .catch((err) => console.error("Lỗi lấy sản phẩm:", err))
       .finally(() => setTimeout(() => setLoading(false), 800));
@@ -250,7 +242,7 @@ export default function DetailProduct() {
                 paddingBottom: "8px",
               }}
             >
-              {(product.image_url || []).slice(startIndex, startIndex + maxThumbnails).map((img, idx) => (
+              {(product.image_url || []).map((img, idx) => (
                 <img
                   key={idx}
                   src={img}

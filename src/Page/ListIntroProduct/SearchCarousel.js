@@ -111,7 +111,7 @@ const SearchCarousel = () => {
     }}
   >
     <img
-      src={product.image_url || "/placeholder.png"}
+      src={product.image_url[0] || "/placeholder.png"}
       alt={product.slug}
       style={{
         width: "100%",

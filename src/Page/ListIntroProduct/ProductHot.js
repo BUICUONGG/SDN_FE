@@ -123,7 +123,7 @@ const ProductHot = () => {
                       >
                         <img
                           alt={product.name}
-                          src={product.image_url || "/placeholder.png"}
+                          src={product.image_url[0] || "/placeholder.png"}
                           style={{
                             width: "100%",
                             height: "100%",

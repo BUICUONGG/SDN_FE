@@ -265,7 +265,7 @@ const OrderCard = ({ order }) => {
           style={{ display: "flex", padding: 10, background: "#fff" }}
         >
           <img
-            src={item.image_url}
+            src={item.image_url[0]}
             alt="product"
             style={{
               width: 80,

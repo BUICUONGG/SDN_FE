@@ -37,7 +37,7 @@ export default function SearchResults() {
       const mapped = data.map((p) => ({
         id: p.id,
         name: p.name,
-        image_url: p.image_url || p.image || '',
+        image_url: p.image_url[0] || p.image || '',
         price: p.resalePrice || p.discountedPrice || p.price || 0,
       }));
 
