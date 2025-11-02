@@ -34,6 +34,7 @@ import {
 } from "@ant-design/icons";
 import { Battery } from "lucide-react";
 import { appService } from "../../../service/appService";
+import ImageUploader from "../../../Components/ImageUploader/ImageUploader";
 
 const { Text, Title } = Typography;
 const { Option } = Select;
@@ -266,7 +267,7 @@ export default function ProductManagement() {
         slug: product.slug,
         price: product.price,
         stock: product.stock || 0,
-        image_url: product.image_url?.join('\n') || '',
+        image_url: Array.isArray(product.image_url) ? product.image_url : [],
         is_active: product.is_active || "pending",
         published_at: product.published_at
           ? new Date(product.published_at).toISOString().slice(0, 16)
@@ -316,14 +317,6 @@ export default function ProductManagement() {
     }
   };
 
-  // Tự động sinh slug
-  const handleNameChange = () => {
-    const name = form.getFieldValue("name");
-    if (name && formModal.mode === "add") {
-      form.setFieldsValue({ slug: generateSlug(name) });
-    }
-  };
-
   // Submit form
   const handleSubmit = () => {
     form
@@ -334,8 +327,8 @@ export default function ProductManagement() {
           slug: values.slug,
           price: values.price,
           stock: values.stock || 0,
-          image_url: values.image_url 
-            ? values.image_url.split('\n').map(url => url.trim()).filter(url => url) 
+          image_url: Array.isArray(values.image_url) 
+            ? values.image_url 
             : [],
           is_active: values.is_active,
           published_at: values.published_at || new Date().toISOString(),
@@ -909,17 +902,28 @@ export default function ProductManagement() {
               </Col>
             </Row>
 
-            {/* Image URLs */}
+            {/* Image Upload */}
             <Row gutter={16}>
               <Col span={24}>
                 <Form.Item
                   name="image_url"
-                  label="URL Hình ảnh"
-                  tooltip="Nhập mỗi URL trên 1 dòng"
+                  label="Hình ảnh sản phẩm"
+                  tooltip="Upload tối đa 5 ảnh, mỗi ảnh < 5MB"
+                  rules={[
+                    { 
+                      required: true, 
+                      message: "Vui lòng upload ít nhất 1 ảnh" 
+                    }
+                  ]}
                 >
-                  <Input.TextArea 
-                    rows={3}
-                    placeholder={"Nhập URL hình ảnh (mỗi URL 1 dòng):\nhttps://example.com/image1.jpg\nhttps://example.com/image2.jpg"}
+                  <ImageUploader
+                    maxCount={5}
+                    folder="ev-products"
+                    tags={['battery', 'product']}
+                    onChange={(urls) => {
+                      form.setFieldsValue({ image_url: urls });
+                    }}
+                    defaultImageUrls={form.getFieldValue('image_url') || []}
                   />
                 </Form.Item>
               </Col>
