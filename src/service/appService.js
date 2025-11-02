@@ -179,6 +179,12 @@ export const appService = {
     });
   },
 
+  getStats: (filter) => {
+    return https.get(`/stats`, {
+      params: filter ? { filter } : {},
+    });
+  },
+
   // payment momo
   CreatePayment: (orderId) => {
     console.log({ orderId });
