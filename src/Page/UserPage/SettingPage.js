@@ -13,6 +13,10 @@ import {
   Row,
   Col,
   Divider,
+  Image,
+  Tag,
+  Empty,
+  Pagination,
 } from "antd";
 import {
   UserOutlined,
@@ -22,6 +26,10 @@ import {
   IdcardOutlined,
   EditOutlined,
   SaveOutlined,
+  ShoppingOutlined,
+  ClockCircleOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
 } from "@ant-design/icons";
 import { localUserService } from "../../service/localService";
 import { profileService } from "../../service/profileService";
@@ -41,6 +49,9 @@ export default function SettingPage() {
   const [activeTab, setActiveTab] = useState("1");
   const [ordersList, setOrdersList] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 3;
 
   
   const accessToken = localUserService.getAccessToken();
@@ -97,8 +108,9 @@ export default function SettingPage() {
     } catch (err) {
       console.error("Lỗi lấy thông tin user:", err);
       const serverMsg = err?.response?.data?.message || err?.message;
+      const errorStatus = err?.response?.status;
       
-      if (status === 401 || status === 403) {
+      if (errorStatus === 401 || errorStatus === 403) {
         message.error("Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.");
         localUserService.remove();
         
@@ -144,16 +156,15 @@ export default function SettingPage() {
   const fetchOrders = useCallback(async () => {
     setOrdersLoading(true);
     try {
-      
       const res = await profileService.getProfileOrders({ page: 0, size: 20 });
       
-      const data = res?.data?.metadata || res?.data?.data || res?.data || {};
-      const items = data?.items || data?.rows || data?.content || data || [];
-      setOrdersList(Array.isArray(items) ? items : []);
+      // API trả về: { success: true, orders: [...], total: 0 }
+      const orders = res?.data?.orders || res?.orders || [];
+      setOrdersList(Array.isArray(orders) ? orders : []);
     } catch (err) {
       console.error("Lỗi lấy lịch sử giao dịch:", err);
-      const status = err?.response?.status;
-      if (status === 401 || status === 403) {
+      const errorStatus = err?.response?.status;
+      if (errorStatus === 401 || errorStatus === 403) {
         message.error("Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại để xem lịch sử giao dịch.");
         localUserService.remove();
         setTimeout(() => {
@@ -297,9 +308,10 @@ export default function SettingPage() {
               <div className="user-info">
                 <Title level={4}>{user?.username || "Người dùng"}</Title>
                 <Space direction="vertical" size={4}>
-                  <Text>
+                  {/*  <Text>
                     <MailOutlined /> {user?.user_profile?.email || "Chưa có email"}
-                  </Text>
+                  </Text> */} 
+
                   <Text>
                     <IdcardOutlined /> {user?.user_roles || "Member"}
                   </Text>
@@ -499,35 +511,228 @@ export default function SettingPage() {
                         </span>
                       ),
                       children: (
-                        <div style={{ padding: 12 }}>
+                        <div style={{ padding: '20px 0' }}>
+                          {/* Filter Tabs */}
+                          <div style={{ marginBottom: 20, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                            <Button 
+                              type={filterStatus === 'all' ? 'primary' : 'default'}
+                              icon={<ShoppingOutlined />}
+                              onClick={() => setFilterStatus('all')}
+                            >
+                              Tất cả ({ordersList.length})
+                            </Button>
+                            <Button 
+                              type={filterStatus === 'pending' ? 'primary' : 'default'}
+                              icon={<ClockCircleOutlined />}
+                              onClick={() => setFilterStatus('pending')}
+                            >
+                              Chờ xử lý ({ordersList.filter(o => o.status === 'pending').length})
+                            </Button>
+                            <Button 
+                              type={filterStatus === 'processing' ? 'primary' : 'default'}
+                              onClick={() => setFilterStatus('processing')}
+                            >
+                              Đang xử lý ({ordersList.filter(o => o.status === 'processing').length})
+                            </Button>
+                            <Button 
+                              type={filterStatus === 'completed' ? 'primary' : 'default'}
+                              icon={<CheckCircleOutlined />}
+                              onClick={() => setFilterStatus('completed')}
+                            >
+                              Hoàn thành ({ordersList.filter(o => o.status === 'completed').length})
+                            </Button>
+                            <Button 
+                              type={filterStatus === 'cancelled' ? 'primary' : 'default'}
+                              icon={<CloseCircleOutlined />}
+                              onClick={() => setFilterStatus('cancelled')}
+                            >
+                              Đã hủy ({ordersList.filter(o => o.status === 'cancelled').length})
+                            </Button>
+                          </div>
+
                           {ordersLoading ? (
-                            <Spin />
-                          ) : ordersList.length === 0 ? (
-                            <Text type="secondary">Chưa có giao dịch</Text>
-                          ) : (
-                            <div>
-                              {ordersList.map((o) => (
-                                <Card key={o.id || o.orderCode} style={{ marginBottom: 12 }}>
-                                  <Row>
-                                    <Col span={12}>
-                                      <Text strong>Mã đơn:</Text> {o.orderCode || o.code || o.id}
-                                    </Col>
-                                    <Col span={12} style={{ textAlign: 'right' }}>
-                                      <Text>{new Date(o.createdAt || o.createdAt || o.created_date || Date.now()).toLocaleString()}</Text>
-                                    </Col>
-                                  </Row>
-                                  <Row style={{ marginTop: 8 }}>
-                                    <Col span={12}>
-                                      <Text>Trạng thái: </Text> {o.status || o.orderStatus}
-                                    </Col>
-                                    <Col span={12} style={{ textAlign: 'right' }}>
-                                      <Text strong>Tổng:</Text> {o.total ? (Number(o.total).toLocaleString('vi-VN') + '₫') : "-"}
-                                    </Col>
-                                  </Row>
-                                </Card>
-                              ))}
+                            <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                              <Spin size="large" tip="Đang tải đơn hàng..." />
                             </div>
-                          )}
+                          ) : (() => {
+                            const filteredOrders = filterStatus === 'all' 
+                              ? ordersList 
+                              : ordersList.filter(o => o.status === filterStatus);
+                            
+                            const startIndex = (currentPage - 1) * pageSize;
+                            const paginatedOrders = filteredOrders.slice(startIndex, startIndex + pageSize);
+
+                            if (filteredOrders.length === 0) {
+                              return (
+                                <Empty 
+                                  description={
+                                    <Text type="secondary" style={{ fontSize: 16 }}>
+                                      {filterStatus === 'all' ? 'Chưa có đơn hàng nào' : `Không có đơn hàng ${filterStatus}`}
+                                    </Text>
+                                  }
+                                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                                  style={{ padding: '60px 0' }}
+                                />
+                              );
+                            }
+
+                            return (
+                              <>
+                                <div style={{ marginBottom: 20 }}>
+                                  {paginatedOrders.map((order, index) => {
+                                    const statusConfig = {
+                                      pending: { color: 'gold', icon: <ClockCircleOutlined />, text: 'Chờ xử lý' },
+                                      processing: { color: 'blue', icon: <ClockCircleOutlined />, text: 'Đang xử lý' },
+                                      shipped: { color: 'cyan', icon: <ClockCircleOutlined />, text: 'Đang giao' },
+                                      completed: { color: 'green', icon: <CheckCircleOutlined />, text: 'Hoàn thành' },
+                                      cancelled: { color: 'red', icon: <CloseCircleOutlined />, text: 'Đã hủy' },
+                                    };
+                                    
+                                    const statusInfo = statusConfig[order.status] || { color: 'default', text: order.status };
+                                    const totalPrice = order.pricing?.total_price || 0;
+                                    const discount = order.discount_value || 0;
+                                    const finalPrice = totalPrice - discount;
+                                    
+                                    const productData = typeof order.product === 'object' ? order.product : null;
+                                    const productName = typeof order.product === 'string' 
+                                      ? order.product 
+                                      : productData?.slug || productData?.name || productData?._id || 'Sản phẩm';
+                                    const productImage = productData?.image_url || productData?.image || 'https://via.placeholder.com/80';
+
+                                    return (
+                                      <Card 
+                                        key={order._id || order.id || index} 
+                                        style={{ 
+                                          marginBottom: 16,
+                                          borderRadius: 8,
+                                          overflow: 'hidden'
+                                        }}
+                                        bodyStyle={{ padding: 0 }}
+                                      >
+                                        {/* Header */}
+                                        <div style={{ 
+                                          padding: '12px 20px', 
+                                          background: '#fafafa',
+                                          borderBottom: '1px solid #f0f0f0',
+                                          display: 'flex',
+                                          justifyContent: 'space-between',
+                                          alignItems: 'center'
+                                        }}>
+                                          <Space>
+                                            <ShoppingOutlined style={{ fontSize: 16 }} />
+                                            <Text strong>Đơn hàng #{startIndex + index + 1}</Text>
+                                            {order.order_type && (
+                                              <Tag color={order.order_type === 'auction' ? 'gold' : 'blue'}>
+                                                {order.order_type === 'auction' ? 'Đấu giá' : 'Mua trực tiếp'}
+                                              </Tag>
+                                            )}
+                                          </Space>
+                                          <Tag color={statusInfo.color} icon={statusInfo.icon}>
+                                            {statusInfo.text}
+                                          </Tag>
+                                        </div>
+
+                                        {/* Body */}
+                                        <div style={{ padding: 20 }}>
+                                          <Row gutter={16} align="middle">
+                                            {/* Product Image */}
+                                            <Col xs={24} sm={6} md={4}>
+                                              <Image
+                                                src={productImage}
+                                                alt={productName}
+                                                width="100%"
+                                                height={80}
+                                                style={{ 
+                                                  objectFit: 'cover', 
+                                                  borderRadius: 8,
+                                                  border: '1px solid #f0f0f0'
+                                                }}
+                                                fallback="https://via.placeholder.com/80?text=No+Image"
+                                                preview={false}
+                                              />
+                                            </Col>
+
+                                            {/* Product Info */}
+                                            <Col xs={24} sm={18} md={12}>
+                                              <Space direction="vertical" size={4} style={{ width: '100%' }}>
+                                                <Text strong style={{ fontSize: 16 }}>{productName}</Text>
+                                                {productData?.brand && (
+                                                  <Text type="secondary" style={{ fontSize: 13 }}>
+                                                    Thương hiệu: {productData.brand}
+                                                  </Text>
+                                                )}
+                                                {productData?.category && (
+                                                  <Text type="secondary" style={{ fontSize: 13 }}>
+                                                    Danh mục: {productData.category}
+                                                  </Text>
+                                                )}
+                                                {order.voucher && (
+                                                  <Tag color="green" style={{ marginTop: 4 }}>
+                                                    <Text style={{ fontSize: 12 }}>
+                                                      Voucher: {typeof order.voucher === 'string' 
+                                                        ? order.voucher 
+                                                        : order.voucher?.code || 'Có'}
+                                                    </Text>
+                                                  </Tag>
+                                                )}
+                                              </Space>
+                                            </Col>
+
+                                            {/* Pricing */}
+                                            <Col xs={24} sm={24} md={8} style={{ textAlign: 'right' }}>
+                                              <Space direction="vertical" size={4} style={{ width: '100%' }}>
+                                                {discount > 0 && (
+                                                  <Text delete type="secondary">
+                                                    {totalPrice.toLocaleString('vi-VN')}₫
+                                                  </Text>
+                                                )}
+                                                <Text strong style={{ fontSize: 20, color: '#ff4d4f' }}>
+                                                  {finalPrice.toLocaleString('vi-VN')}₫
+                                                </Text>
+                                                {order.transaction && order.transaction[0] && (
+                                                  <Tag color={order.transaction[0].status_transaction === 'completed' ? 'success' : 'warning'}>
+                                                    {order.transaction[0].status_transaction === 'completed' ? 'Đã thanh toán' : 'Chờ thanh toán'}
+                                                  </Tag>
+                                                )}
+                                              </Space>
+                                            </Col>
+                                          </Row>
+
+                                          {/* Cancellation Reason */}
+                                          {order.status === 'cancelled' && order.cancellation_reason && (
+                                            <div style={{ 
+                                              marginTop: 12, 
+                                              padding: 12, 
+                                              background: '#fff7e6',
+                                              borderLeft: '3px solid #faad14',
+                                              borderRadius: 4
+                                            }}>
+                                              <Text type="secondary">
+                                                <strong>Lý do hủy:</strong> {order.cancellation_reason}
+                                              </Text>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </Card>
+                                    );
+                                  })}
+                                </div>
+
+                                {/* Pagination */}
+                                {filteredOrders.length > pageSize && (
+                                  <div style={{ textAlign: 'center', marginTop: 20 }}>
+                                    <Pagination
+                                      current={currentPage}
+                                      total={filteredOrders.length}
+                                      pageSize={pageSize}
+                                      onChange={(page) => setCurrentPage(page)}
+                                      showSizeChanger={false}
+                                    />
+                                  </div>
+                                )}
+                              </>
+                            );
+                          })()}
                         </div>
                       ),
                     },
