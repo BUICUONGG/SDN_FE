@@ -95,12 +95,28 @@ export const appService = {
   getAutions: () => https.get(`/auctions`),
   getAutionDetail: (id) => https.get(`/auctions/${id}`),
   postAutionBid: (id, bidAmount) => https.post(`/auctions/${id}/bid`,{ bid_amount: bidAmount }),
+  postAution: (data) => https.post(`/auctions`, data),
 
-  getWalletBalance: () => https.get('/wallet/balance'),
+  getWalletBalance: async () => {
+  try {
+    return await https.get('/wallet/balance');
+  } catch (err) {
+    if (err.response?.status === 404) {
+      // Chưa có ví → tạo mới
+      await https.post('/wallet/deposit',{ amount: 1 });
+      return https.get('/wallet/balance');
+    }
+    throw err;
+  }
+},
   depositToWallet: (amount) => https.post('/wallet/deposit', { amount }),
   withdrawFromWallet: (amount) => https.post('/wallet/withdraw', { amount }),
-  bidAuction: (auctionId, amount) => https.post(`/auctions/${auctionId}/bid`, { amount }),
-
+  bidAuction: (auctionId, amount) => https.post(`/auctions/${auctionId}/bid`, { bid_amount: amount }),
+  deleteAuction: (id) => https.delete(`/auctions/${id}`),
+  endAuction: (id) => https.post(`/auctions/${id}/end`),
+  editAuction: (id) => https.put(`/auctions/${id}`),
+  // service/appService.js
+  getBidHistory: (auctionId) => https.get(`/auctions/${auctionId}/bid`),
   getTransactionHistory: () => https.get('/wallet/transactions'),
 
   searchProducts: (criteria) => {

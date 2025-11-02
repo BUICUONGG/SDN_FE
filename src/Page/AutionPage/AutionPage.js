@@ -1,5 +1,7 @@
+// src/Page/AuctionPage.js
 import React, { useEffect, useState } from "react";
 import { appService } from "../../service/appService";
+import { Popover, Button, message } from "antd";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -8,6 +10,11 @@ export default function AuctionPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const isAdmin = () => {
+    const user = JSON.parse(localStorage.getItem("USER_INFO") || "{}");
+    return user && user.user_roles === "Admin";
+  };
 
   useEffect(() => {
     const fetchAuctions = async () => {
@@ -20,28 +27,54 @@ export default function AuctionPage() {
         setLoading(false);
       }
     };
-
     fetchAuctions();
   }, []);
 
   const formatPrice = (price) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(price);
+    return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(price);
   };
 
-  const handleBidClick = (auctionId) => {
-    window.location.href = `/auction-channel/detail/${auctionId}`;
+  const handleBidClick = (id) => {
+    window.location.href = `/auction-channel/detail/${id}`;
   };
 
-  // Phân trang logic
+  const goToCreate = () => {
+    window.location.href = "/create-auction";
+  };
+
+  const goToEdit = (id) => {
+    window.location.href = `/edit-auction/${id}`;
+  };
+
+  const handleDelete = async (id, setOpen) => {
+    try {
+      await appService.deleteAuction(id);
+      setAuctions(auctions.filter(a => a._id !== id));
+      message.success("Xóa đấu giá thành công!");
+      setOpen(false);
+    } catch (err) {
+      message.error("Xóa đấu giá thất bại!");
+    }
+  };
+
+  const handleEnd = async (id, setOpen) => {
+    try {
+      await appService.endAuction(id);
+      setAuctions(auctions.map(a => 
+        a._id === id ? { ...a, status: "ended" } : a
+      ));
+      message.success("Đấu giá đã kết thúc!");
+      setOpen(false);
+    } catch (err) {
+      message.error("Kết thúc đấu giá thất bại!");
+    }
+  };
+
   const totalPages = Math.ceil(auctions.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const currentAuctions = auctions.slice(startIndex, endIndex);
 
-  // Hàm render số trang (hiển thị 5 số, với ... nếu nhiều)
   const renderPageNumbers = () => {
     const pages = [];
     const maxVisible = 5;
@@ -53,304 +86,214 @@ export default function AuctionPage() {
     }
 
     if (startPage > 1) {
-      pages.push(
-        <button key={1} onClick={() => setCurrentPage(1)} className="page-btn">
-          1
-        </button>
-      );
-      if (startPage > 2)
-        pages.push(
-          <span key="start-ellipsis" className="ellipsis">
-            ...
-          </span>
-        );
+      pages.push(<button key={1} onClick={() => setCurrentPage(1)} className="page-btn">1</button>);
+      if (startPage > 2) pages.push(<span key="start-ellipsis" className="ellipsis">...</span>);
     }
 
     for (let i = startPage; i <= endPage; i++) {
       pages.push(
-        <button
-          key={i}
-          onClick={() => setCurrentPage(i)}
-          className={`page-btn ${i === currentPage ? "active" : ""}`}
-        >
+        <button key={i} onClick={() => setCurrentPage(i)} className={`page-btn ${i === currentPage ? "active" : ""}`}>
           {i}
         </button>
       );
     }
 
     if (endPage < totalPages) {
-      if (endPage < totalPages - 1)
-        pages.push(
-          <span key="end-ellipsis" className="ellipsis">
-            ...
-          </span>
-        );
-      pages.push(
-        <button
-          key={totalPages}
-          onClick={() => setCurrentPage(totalPages)}
-          className="page-btn"
-        >
-          {totalPages}
-        </button>
-      );
+      if (endPage < totalPages - 1) pages.push(<span key="end-ellipsis" className="ellipsis">...</span>);
+      pages.push(<button key={totalPages} onClick={() => setCurrentPage(totalPages)} className="page-btn">{totalPages}</button>);
     }
 
     return pages;
   };
 
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <p>Đang tải đấu giá...</p>
-      </div>
-    );
-  }
+  // POPUP CONTENT CHO ADMIN
+  const AdminActions = ({ auction }) => {
+    const [open, setOpen] = useState(false);
+    const isEnded = auction.status === "ended";
 
-  if (error) {
     return (
-      <div className="error-container">
-        <p>{error}</p>
-      </div>
+      <Popover
+        content={
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, width: 140 }}>
+            <Button
+              type="link"
+              size="small"
+              onClick={() => goToEdit(auction._id)}
+              style={{ color: "#f59e0b", padding: 0, textAlign: "left" }}
+            >
+              Sửa
+            </Button>
+
+            <Button
+              type="link"
+              size="small"
+              danger
+              onClick={() => handleDelete(auction._id, setOpen)}
+              style={{ padding: 0, textAlign: "left" }}
+            >
+              Xóa
+            </Button>
+
+            <Button
+              type="link"
+              size="small"
+              disabled={isEnded}
+              onClick={() => handleEnd(auction._id, setOpen)}
+              style={{
+                padding: 0,
+                textAlign: "left",
+                color: isEnded ? "#94a3b8" : "#ea580c",
+                cursor: isEnded ? "not-allowed" : "pointer"
+              }}
+            >
+              {isEnded ? "Đã kết thúc" : "Kết thúc"}
+            </Button>
+          </div>
+        }
+        trigger="click"
+        open={open}
+        onOpenChange={setOpen}
+        placement="bottomRight"
+      >
+        <button className="admin-menu-btn">
+          <span style={{ fontSize: 18 }}>More</span>
+        </button>
+      </Popover>
     );
-  }
+  };
+
+  if (loading) return <div className="loading-container"><p>Đang tải đấu giá...</p></div>;
+  if (error) return <div className="error-container"><p>{error}</p></div>;
 
   return (
     <>
       <style jsx>{`
-        * {
-          box-sizing: border-box;
-          margin: 0;
-          padding: 0;
-        }
-        body {
-          font-family: Arial, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8fafc; }
 
-        .page-container {
-          min-height: 100vh;
-          background: linear-gradient(to bottom, #f0f4ff, #ffffff);
-          padding: 48px 16px;
-        }
+        .page-container { min-height: 100vh; padding: 48px 16px; background: linear-gradient(to bottom, #f0f4ff, #ffffff); }
+        .max-width { max-width: 1400px; margin: 0 auto; }
 
-        .max-width {
-          max-width: 1400px;
-          margin: 0 auto;
-        }
+        h1 { font-size: 36px; font-weight: bold; text-align: center; color: #1e293b; margin-bottom: 32px; }
 
-        h1 {
-          font-size: 36px;
-          font-weight: bold;
-          text-align: center;
-          color: #333;
-          margin-bottom: 40px;
+        .create-btn-container { text-align: center; margin: 24px 0; }
+        .create-btn {
+          background: linear-gradient(to right, #10b981, #059669);
+          color: white; border: none; padding: 12px 32px;
+          font-size: 16px; font-weight: bold; border-radius: 12px;
+          cursor: pointer; transition: all 0.2s;
         }
+        .create-btn:hover { opacity: 0.9; }
 
-        .empty-text {
-          text-align: center;
-          color: #666;
-          font-size: 18px;
-        }
+        .empty-text { text-align: center; color: #64748b; font-size: 18px; }
 
         .grid {
-          display: grid;
-          grid-template-columns: repeat(1, 1fr);
-          gap: 32px;
-          margin-bottom: 48px;
+          display: grid; grid-template-columns: 1fr; gap: 32px; margin-bottom: 48px;
         }
-
-        @media (min-width: 640px) {
-          .grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-        }
-
-        @media (min-width: 1024px) {
-          .grid {
-            grid-template-columns: repeat(3, 1fr);
-          }
-        }
-
-        @media (min-width: 1280px) {
-          .grid {
-            grid-template-columns: repeat(4, 1fr);
-          }
-        }
+        @media (min-width: 640px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 1280px) { .grid { grid-template-columns: repeat(4, 1fr); } }
 
         .card {
-          background: white;
-          border-radius: 16px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          overflow: hidden;
-          transition: all 0.3s ease;
+          background: white; border-radius: 16px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          overflow: hidden; transition: all 0.3s ease;
+          position: relative;
         }
-
         .card:hover {
-          box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 12px 24px rgba(0,0,0,0.2);
           transform: translateY(-8px);
         }
 
-        .image-wrapper {
-          position: relative;
-        }
-
-        .image-wrapper img {
-          width: 100%;
-          height: 192px;
-          object-fit: cover;
-        }
-
+        .image-wrapper { position: relative; }
+        .image-wrapper img { width: 100%; height: 192px; object-fit: cover; }
         .live-badge {
-          position: absolute;
-          top: 8px;
-          right: 8px;
-          background: #ef4444;
-          color: white;
-          padding: 4px 12px;
-          border-radius: 999px;
-          font-size: 12px;
-          font-weight: bold;
+          position: absolute; top: 8px; right: 8px;
+          background: #ef4444; color: white; padding: 4px 12px;
+          border-radius: 999px; font-size: 12px; font-weight: bold;
         }
 
-        .card-body {
-          padding: 20px;
-        }
-
+        .card-body { padding: 20px; }
         .product-name {
-          font-size: 20px;
-          font-weight: bold;
-          color: #333;
-          margin-bottom: 8px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+          font-size: 20px; font-weight: bold; color: #1e293b;
+          margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-
         .description {
-          color: #666;
-          font-size: 14px;
-          margin-bottom: 16px;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
+          color: #64748b; font-size: 14px; margin-bottom: 16px;
+          display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
         }
 
         .info-row {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 8px;
-          font-size: 14px;
+          display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;
         }
-
-        .label {
-          color: #888;
-        }
-        .start-price {
-          color: #10b981;
-          font-weight: bold;
-        }
-        .current-bid {
-          color: #3b82f6;
-          font-weight: bold;
-          font-size: 18px;
-        }
-        .deposit {
-          color: #f97316;
-          font-weight: bold;
-        }
+        .label { color: #94a3b8; }
+        .start-price { color: #10b981; font-weight: bold; }
+        .current-bid { color: #3b82f6; font-weight: bold; font-size: 18px; }
+        .deposit { color: #f97316; font-weight: bold; }
 
         .bid-button {
-          width: 100%;
-          background: linear-gradient(to right, #3b82f6, #6366f1);
-          color: white;
-          font-weight: bold;
-          padding: 12px;
-          border: none;
-          border-radius: 8px;
-          cursor: pointer;
-          font-size: 16px;
+          width: 100%; background: linear-gradient(to right, #3b82f6, #6366f1);
+          color: white; font-weight: bold; padding: 12px; border: none;
+          border-radius: 8px; cursor: pointer; font-size: 16px;
+          transition: all 0.2s; margin-top: 16px;
+        }
+        .bid-button:hover { opacity: 0.9; }
+
+        /* ADMIN MENU BUTTON */
+        .admin-menu-btn {
+          position: absolute; top: 8px; left: 8px;
+          background: rgba(255,255,255,0.9); color: #374151;
+          border: none; border-radius: 8px; width: 36px; height: 36px;
+          cursor: pointer; font-size: 18px; display: flex;
+          align-items: center; justify-content: center;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
           transition: all 0.2s;
-          margin-top: 16px;
+        }
+        .admin-menu-btn:hover {
+          background: white; transform: scale(1.1);
         }
 
-        /* Pagination styles */
         .pagination {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          gap: 12px;
-          flex-wrap: wrap;
+          display: flex; justify-content: center; align-items: center;
+          gap: 12px; flex-wrap: wrap; margin-top: 32px;
         }
-
         .nav-btn {
-          background: #e5e7eb;
-          color: #374151;
-          padding: 8px 16px;
-          border: none;
-          border-radius: 8px;
-          cursor: pointer;
-          font-weight: bold;
-          transition: all 0.2s;
+          background: #e5e7eb; color: #374151; padding: 8px 16px;
+          border: none; border-radius: 8px; cursor: pointer;
+          font-weight: bold; transition: all 0.2s;
         }
-
-        .nav-btn:hover:not(:disabled) {
-          background: #d1d5db;
-        }
-
-        .nav-btn:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
+        .nav-btn:hover:not(:disabled) { background: #d1d5db; }
+        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .page-btn {
-          background: #f3f4f6;
-          color: #374151;
-          padding: 8px 16px;
-          border: none;
-          border-radius: 8px;
-          cursor: pointer;
-          font-weight: bold;
-          transition: all 0.2s;
+          background: #f3f4f6; color: #374151; padding: 8px 16px;
+          border: none; border-radius: 8px; cursor: pointer;
+          font-weight: bold; transition: all 0.2s;
         }
+        .page-btn:hover { background: #e5e7eb; }
+        .page-btn.active { background: #3b82f6; color: white; }
 
-        .page-btn:hover {
-          background: #e5e7eb;
-        }
+        .ellipsis { color: #94a3b8; font-weight: bold; }
 
-        .page-btn.active {
-          background: #3b82f6;
-          color: white;
+        .loading-container, .error-container {
+          min-height: 100vh; display: flex; align-items: center;
+          justify-content: center; background: #f3f4f6;
         }
-
-        .ellipsis {
-          color: #888;
-          font-weight: bold;
-        }
-
-        .loading-container,
-        .error-container {
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: #f3f4f6;
-        }
-
-        .loading-container p {
-          font-size: 20px;
-          color: #555;
-          font-weight: bold;
-        }
-        .error-container p {
-          font-size: 18px;
-          color: #ef4444;
-        }
+        .loading-container p { font-size: 20px; color: #64748b; font-weight: bold; }
+        .error-container p { font-size: 18px; color: #ef4444; }
       `}</style>
 
       <div className="page-container">
         <div className="max-width">
           <h1>Danh Sách Đấu Giá</h1>
+
+          {isAdmin() && (
+            <div className="create-btn-container">
+              <button onClick={goToCreate} className="create-btn">
+                Tạo Phiên Đấu Giá Mới
+              </button>
+            </div>
+          )}
 
           {auctions.length === 0 ? (
             <p className="empty-text">Hiện chưa có đấu giá nào.</p>
@@ -359,52 +302,38 @@ export default function AuctionPage() {
               <div className="grid">
                 {currentAuctions.map((auction) => {
                   const product = auction.product || {};
-                  const imgUrl =
-                    product.image_url?.[0] ||
-                    "https://via.placeholder.com/300x200?text=No+Image";
+                  const imgUrl = product.image_url?.[0] || "https://via.placeholder.com/300x200?text=No+Image";
 
                   return (
                     <div key={auction._id} className="card">
                       <div className="image-wrapper">
-                        <img src={imgUrl} alt={product.name || "Sản phẩm"} />
-                        <div className="live-badge">Live</div>
+                        <img src={imgUrl} alt={product.slug} />
+                        <div className="live-badge">{auction.status}</div>
+
+                        {/* ADMIN MENU BUTTON */}
+                        {isAdmin() && <AdminActions auction={auction} />}
                       </div>
 
                       <div className="card-body">
-                        <div className="product-name">
-                          {product.slug || "Không tên"}
-                        </div>
-                        <p className="description">
-                          {product.description || "Không có mô tả."}
-                        </p>
+                        <div className="product-name">{product.slug || "Không tên"}</div>
+                        <p className="description">{auction.status || "Đang diễn ra"}</p>
 
                         <div className="info-row">
                           <span className="label">Giá khởi điểm:</span>
-                          <span className="start-price">
-                            {formatPrice(auction.start_price)}
-                          </span>
+                          <span className="start-price">{formatPrice(auction.start_price)}</span>
                         </div>
-
                         <div className="info-row">
                           <span className="label">Bid hiện tại:</span>
                           <span className="current-bid">
-                            {auction.current_bid
-                              ? formatPrice(auction.current_bid)
-                              : "Chưa có"}
+                            {auction.current_bid ? formatPrice(auction.current_bid) : "Chưa có"}
                           </span>
                         </div>
-
                         <div className="info-row">
                           <span className="label">Đặt cọc:</span>
-                          <span className="deposit">
-                            {formatPrice(auction.deposit_required)}
-                          </span>
+                          <span className="deposit">{formatPrice(auction.deposit_required)}</span>
                         </div>
 
-                        <button
-                          onClick={() => handleBidClick(auction._id)}
-                          className="bid-button"
-                        >
+                        <button onClick={() => handleBidClick(auction._id)} className="bid-button">
                           Đặt Giá Ngay
                         </button>
                       </div>
@@ -415,25 +344,11 @@ export default function AuctionPage() {
 
               {totalPages > 1 && (
                 <div className="pagination">
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(1, prev - 1))
-                    }
-                    disabled={currentPage === 1}
-                    className="nav-btn"
-                  >
+                  <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="nav-btn">
                     Previous
                   </button>
-
                   {renderPageNumbers()}
-
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-                    }
-                    disabled={currentPage === totalPages}
-                    className="nav-btn"
-                  >
+                  <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="nav-btn">
                     Next
                   </button>
                 </div>

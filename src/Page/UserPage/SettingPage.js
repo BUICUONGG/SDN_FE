@@ -98,15 +98,7 @@ export default function SettingPage() {
       console.error("Lỗi lấy thông tin user:", err);
       const serverMsg = err?.response?.data?.message || err?.message;
       
-      if (status === 401 || status === 403) {
-        message.error("Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.");
-        localUserService.remove();
-        
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 800);
-        return;
-      }
+     
       
       const cached = localUserService.get();
       if (cached) {
