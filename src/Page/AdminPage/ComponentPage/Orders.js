@@ -38,7 +38,6 @@ const getStatusTag = (status) => {
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
-  const [products, setProducts] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [detailVisible, setDetailVisible] = useState(false);
   const [editVisible, setEditVisible] = useState(false);
@@ -46,8 +45,7 @@ export default function AdminOrders() {
   const [errorInModal, setErrorInModal] = useState("");
   const [newStatus, setNewStatus] = useState("");
 
-  // === Fetch orders + products ===
-  const fetchOrdersAndProducts = async () => {
+  const fetchOrders = async () => {
     setLoading(true);
     try {
       const userInfo = JSON.parse(localStorage.getItem("USER_INFO") || "{}");
@@ -64,58 +62,47 @@ export default function AdminOrders() {
         }
       }
 
-      // Gọi song song 2 API
-      const [orderRes, productRes] = await Promise.all([
-        fetch(`${BASE_URL2}/orders`, { headers }),
-        fetch(`${BASE_URL2}/product`, { headers }),
-      ]);
+      const orderRes = await fetch(`${BASE_URL2}/orders`, { headers });
 
-      if (!orderRes.ok || !productRes.ok) {
+      if (!orderRes.ok) {
         throw new Error("Không thể tải dữ liệu từ server");
       }
 
       const orderData = await orderRes.json();
-      const productData = await productRes.json();
 
       const orderList = Array.isArray(orderData?.orders)
         ? orderData.orders
         : [];
-      const productList = Array.isArray(productData?.products)
-        ? productData.products
-        : [];
-
-      // Map productId -> product
-      const productMap = {};
-      productList.forEach((p) => {
-        productMap[p._id] = p;
-      });
 
       // Gộp dữ liệu sản phẩm vào orders
       const mergedOrders = orderList.map((order) => {
-        const productId = order?.auction?.product;
-        const product = productMap[productId];
+        let productInfo = null;
+
+        if (order.order_type === 'direct' && order.product) {
+          productInfo = order.product;
+        } else if (order.order_type === 'auction_win' && order.auction?.product) {
+          productInfo = order.auction.product;
+        }
+
         return {
           ...order,
-          productInfo: product || null,
+          productInfo,
         };
       });
 
       setOrders(mergedOrders);
-      setProducts(productList);
     } catch (err) {
       message.error(err.message || "Không thể tải dữ liệu");
       setOrders([]);
-      setProducts([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchOrdersAndProducts();
+    fetchOrders();
   }, []);
 
-  // === Cập nhật trạng thái đơn hàng ===
   const handleUpdateStatus = async (orderId, newStatus) => {
     if (!orderId) return;
     setLoading(true);
@@ -177,7 +164,7 @@ export default function AdminOrders() {
 
       message.success("Cập nhật trạng thái đơn hàng thành công!");
       setEditVisible(false);
-      await fetchOrdersAndProducts();
+      await fetchOrders();
     } catch (err) {
       const msg = err.message || "Không thể cập nhật trạng thái";
       setErrorInModal(msg);
@@ -217,28 +204,43 @@ export default function AdminOrders() {
       render: (id) => <code>{id}</code>,
     },
     {
-      title: "Tên sản phẩm",
+      title: "Tên sản phẩm (Pin)",
       key: "productName",
       render: (_, record) => {
-        const name =
-          record.productInfo?.vehicle?.[0]?.name ||
+        const batteryName = record.productInfo?.battery?.name ||
+          record.productInfo?.vehicle?.[0]?.battery?.name ||
           record.productInfo?.slug ||
           "Không tìm thấy sản phẩm";
         return (
           <Tag color="blue" style={{ fontWeight: 500 }}>
-            {name}
+            {batteryName}
           </Tag>
         );
       },
     },
     {
-      title: "Giá hiện tại",
-      dataIndex: ["auction", "current_bid"],
-      key: "current_bid",
-      render: (price) => (
-        <span>
-          <DollarOutlined /> {price?.toLocaleString("vi-VN")} ₫
-        </span>
+      title: "Giá",
+      key: "price",
+      render: (_, record) => {
+        const price = record.order_type === 'auction_win'
+          ? record.auction?.current_bid
+          : record.pricing?.unit_price;
+
+        return (
+          <span>
+            <DollarOutlined /> {price?.toLocaleString("vi-VN") || '0'} ₫
+          </span>
+        );
+      },
+    },
+    {
+      title: "Loại đơn",
+      dataIndex: "order_type",
+      key: "order_type",
+      render: (type) => (
+        <Tag color={type === 'auction_win' ? 'purple' : 'green'}>
+          {type === 'auction_win' ? 'Đấu giá' : 'Trực tiếp'}
+        </Tag>
       ),
     },
     {
@@ -330,13 +332,24 @@ export default function AdminOrders() {
             <Descriptions.Item label="Mã đơn hàng">
               <code>{selectedOrder._id}</code>
             </Descriptions.Item>
-            <Descriptions.Item label="Tên sản phẩm">
-              {selectedOrder.productInfo?.vehicle?.[0]?.name ||
+            <Descriptions.Item label="Tên Pin">
+              {selectedOrder.productInfo?.battery?.name ||
+                selectedOrder.productInfo?.vehicle?.[0]?.battery?.name ||
                 selectedOrder.productInfo?.slug ||
                 "Không tìm thấy sản phẩm"}
             </Descriptions.Item>
-            <Descriptions.Item label="Giá hiện tại">
-              {selectedOrder?.auction?.current_bid?.toLocaleString("vi-VN")} ₫
+            <Descriptions.Item label="Giá">
+              {(() => {
+                const price = selectedOrder.order_type === 'auction_win'
+                  ? selectedOrder.auction?.current_bid
+                  : selectedOrder.pricing?.unit_price;
+                return `${price?.toLocaleString("vi-VN") || '0'} ₫`;
+              })()}
+            </Descriptions.Item>
+            <Descriptions.Item label="Loại đơn hàng">
+              <Tag color={selectedOrder.order_type === 'auction_win' ? 'purple' : 'green'}>
+                {selectedOrder.order_type === 'auction_win' ? 'Đấu giá' : 'Mua trực tiếp'}
+              </Tag>
             </Descriptions.Item>
             <Descriptions.Item label="Trạng thái">
               {getStatusTag(selectedOrder.status)}

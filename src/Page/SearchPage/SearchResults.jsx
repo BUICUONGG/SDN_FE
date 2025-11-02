@@ -1,12 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./SearchResults.css";
 import { appService } from "../../service/appService";
-import i1 from "../../img/sr1.jpg";
-import i2 from "../../img/sr2.jpg";
-import i3 from "../../img/sr3.jpg";
-import i4 from "../../img/sr4.jpg";
-import i5 from "../../img/sr5.jpg";
 
 export default function SearchResults() {
   const location = useLocation();
@@ -25,58 +20,44 @@ export default function SearchResults() {
 
   const fetchSearchResults = async (kw) => {
     try {
-      const res = await appService.searchProducts({
-        search: kw,
-        currentPage: 1,
-        pageSize: 40,
+      const res = await appService.getAllProduct();
+
+      const data = res.data?.products || res.data || [];
+
+      if (!Array.isArray(data)) {
+        setNewProducts([]);
+        setBestDeals([]);
+        return;
+      }
+
+      const allMapped = data.map((p) => {
+        const batteryName = p.vehicle?.[0]?.battery?.name || p.battery?.name || p.name || '';
+        const productId = p._id || p.id;
+        const brandName = p.brand?.name || '';
+        const categoryName = p.category?.name || '';
+
+        return {
+          id: productId,
+          name: batteryName,
+          image_url: p.image_url?.[0] || p.image || 'https://via.placeholder.com/300x200?text=No+Image',
+          price: p.price || 0,
+          searchText: `${batteryName} ${p.slug || ''} ${brandName} ${categoryName}`.toLowerCase(),
+        };
       });
-      const data = res.data.metadata.metadata || [];
 
-      console.log(data)
+      const keyword = kw.toLowerCase().trim();
+      const filtered = keyword
+        ? allMapped.filter(p => p.searchText.includes(keyword))
+        : allMapped;
 
-      const mapped = data.map((p) => ({
-        id: p.id,
-        name: p.name,
-        image_url: p.image_url[0] || p.image || '',
-        price: p.resalePrice || p.discountedPrice || p.price || 0,
-      }));
-
-      setNewProducts(mapped.slice(0, 10));
-      setBestDeals(mapped.slice(10, 20));
+      setNewProducts(filtered.slice(0, 10));
+      setBestDeals(filtered.slice(10, 20));
     } catch (err) {
-      console.error("❌ Lỗi fetch:", err);
+      setNewProducts([]);
+      setBestDeals([]);
     }
   };
 
-
-  const categoryTags2 = [
-    {
-      name:  "Trang phục thường ngày",
-      image: i1
-    },
-    {
-      name:  "Dạ tiệc & Trang trọng",
-      image: i2
-    },
-    {
-      name:  "Hoa xuân rực rỡ",
-      image: i3
-    },
-    {
-      name:  "Trang phục du lịch",
-      image: i4
-    },
-    {
-      name:  "Dự tiệc cưới",
-      image: i5
-    }
-  ];
-
-  const filters = [
-    "Kích thước", "Danh mục", "Bí quyết", "Phong cách", "Đầm dài",
-    "Thương hiệu", "Mức giá", "Tình trạng", "Màu sắc", "Kiểu cổ áo",
-    "Chất liệu", "Hoạ tiết", "Cỡ", "Cách sử dụng"
-  ];
 
   const renderProductCard = (product) => (
     <div
@@ -112,33 +93,26 @@ export default function SearchResults() {
     <div style={{
       padding: '3% 10%'
     }} className="search-page">
-      <h2 className="page-title">Xu hướng</h2>
+      {keyword && (
+        <h2 className="page-title">Kết quả tìm kiếm: "{keyword}"</h2>
+      )}
 
-      <div className="category-tags">
-        {categoryTags2.map((tag) => (
+      <div style={{ marginTop: '30px' }}>
+        {newProducts.length === 0 && bestDeals.length === 0 && keyword ? (
           <div style={{
-            width: '20%'
-          }} className="tag-card" key={tag.name}>
-            <img src={tag.image} alt={tag.name} />
-            <span>{tag.name}</span>
+            textAlign: 'center',
+            padding: '50px 20px',
+            fontSize: '18px',
+            color: '#666'
+          }}>
+            Không tìm thấy pin nào phù hợp với từ khóa "{keyword}"
           </div>
-        ))}
-      </div>
-
-      <div className="search-layout">
-        <div className="sidebar-filter">
-          <h3>Bộ lọc sản phẩm</h3>
-          {filters.map((f) => (
-            <div key={f} className="filter-item">
-              <span>{f}</span> <span className="plus">+</span>
-            </div>
-          ))}
-        </div>
-
-        <div className="product-sections">
-          {renderProductSection("Mới về", newProducts)}
-          {renderProductSection("Giá tốt", bestDeals)}
-        </div>
+        ) : (
+          <>
+            {newProducts.length > 0 && renderProductSection("Kết quả tìm kiếm", newProducts)}
+            {bestDeals.length > 0 && renderProductSection("Các sản phẩm khác", bestDeals)}
+          </>
+        )}
       </div>
     </div>
   );
