@@ -5,7 +5,6 @@ import { localUserService } from "../../service/localService";
 import { appService } from "../../service/appService";
 import { useNavigate } from "react-router-dom";
 const { Meta } = Card;
-const { TabPane } = Tabs;
 
 const statuses = [
   "Tất cả",
@@ -64,6 +63,21 @@ const ProductHot = () => {
     }
   };
 
+  
+  const tabItems = statuses.map((status) => ({
+    key: status,
+    label: (
+      <span
+        style={{
+          color: selectedTab === status ? "green" : undefined,
+          fontWeight: "bold",
+        }}
+      >
+        {status}
+      </span>
+    ),
+  }));
+
   return (
     <div style={{ padding: "5% 10%" }}>
       <h2
@@ -78,23 +92,12 @@ const ProductHot = () => {
         Sản Phẩm
       </h2>
 
-      <Tabs activeKey={selectedTab} onChange={handleTabChange} centered>
-        {statuses.map((status) => (
-          <TabPane
-            tab={
-              <span
-                style={{
-                  color: selectedTab === status ? "green" : undefined,
-                  fontWeight: "bold",
-                }}
-              >
-                {status}
-              </span>
-            }
-            key={status}
-          />
-        ))}
-      </Tabs>
+      <Tabs 
+        activeKey={selectedTab} 
+        onChange={handleTabChange} 
+        centered
+        items={tabItems}
+      />
 
       {loading ? (
         <div style={{ textAlign: "center", marginTop: 50 }}>
@@ -103,8 +106,8 @@ const ProductHot = () => {
       ) : (
         <>
           <Row gutter={[16, 16]} style={{ marginTop: 20 }}>
-            {products.map((product) => (
-              <Col xs={12} sm={8} md={6} lg={4} xl={4} key={product.id}>
+            {products.map((product, index) => (
+              <Col xs={12} sm={8} md={6} lg={4} xl={4} key={product._id || product.id || index}>
                 <Card
                   hoverable
                   onClick={() => navigate(`/product/${product._id}`)}
@@ -163,6 +166,7 @@ const ProductHot = () => {
               }}
             >
               <Button
+                key="prev"
                 icon={<LeftOutlined />}
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
@@ -170,7 +174,7 @@ const ProductHot = () => {
               />
               {Array.from({ length: totalPages }, (_, i) => (
                 <Button
-                  key={i + 1}
+                  key={`page-${i + 1}`}
                   style={{
                     margin: "0 5px",
                     backgroundColor:
@@ -183,6 +187,7 @@ const ProductHot = () => {
                 </Button>
               ))}
               <Button
+                key="next"
                 icon={<RightOutlined />}
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}

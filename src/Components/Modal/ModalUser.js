@@ -42,7 +42,6 @@ export default function ModalUser({ isOpen, onClose }) {
   const [errMessage, setErrMessage] = useState("");
   const [errorModal, setErrorModal] = useState(false);
   const [pass, setPass] = useState("");
-  const [pass2, setPass2] = useState("");
   const [isRP, setIsRP] = useState(false);
   const [isDK, setIsDK] = useState(false);
   const dispatch = useDispatch();
@@ -161,58 +160,77 @@ export default function ModalUser({ isOpen, onClose }) {
   }, [isOtp, countDown]);
 
   const handleLogin = async () => {
-    const emailValidation = validateEmail(email);
-    const passValidation = validatePass(pass);
+    // Validation
     if (!email || !pass) {
-      openNotification("error", "Lỗi", "vui lòng nhập đầy đủ thông tin");
+      openNotification("error", "Lỗi", "Vui lòng nhập đầy đủ thông tin");
       return;
     }
+
+    const emailValidation = validateEmail(email);
     if (!emailValidation.isValid) {
-      openNotification("error", "Lỗi", "email không đúng định dạng");
-    } else if (!passValidation.isValid) {
+      openNotification("error", "Lỗi", "Email không đúng định dạng");
+      return;
+    }
+
+    const passValidation = validatePass(pass);
+    if (!passValidation.isValid) {
       openNotification(
         "error",
         "Lỗi",
         "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ cái, số và ký tự đặc biệt"
       );
-    } else {
-      try {
-        const loginData = {
-          username: email,
-          password: pass,
-        };
-        setLoading(true);
-        console.log(loginData);
-        const res = await userService.postLogin(loginData);
-        console.log(res);
-        localUserService.set(res.data);
-        localStorage.setItem("token", "your_jwt_token");
-        setTimeout(() => {
-          openNotification("success", "Thành công", "Đăng nhập thành công!");
-        }, 1000);
-        setTimeout(() => {
-          dispatch(setLoginAction(res.data));
-          setLoading(false);
-          // window.location.reload();
-        }, 1500);
-      } catch (err) {
-        console.error("Lỗi đăng nhập:", err);
-        setTimeout(() => {
-          openNotification(
-            "error",
-            "Lỗi",
-            err?.response?.data?.metadata?.message
-          );
-          setLoading(false);
-        }, 1500);
+      return;
+    }
+
+    // Login
+    try {
+      setLoading(true);
+      const loginData = {
+        username: email,
+        password: pass,
+      };
+      
+      console.log("📤 Sending login data:", loginData);
+      const res = await userService.postLogin(loginData);
+      console.log("✅ Login success:", res.data);
+      
+      // Lưu thông tin user và token
+      localUserService.set(res.data);
+      
+      openNotification("success", "Thành công", "Đăng nhập thành công!");
+      
+      setTimeout(() => {
+        dispatch(setLoginAction(res.data));
+        setLoading(false);
+        window.location.reload();
+      }, 1000);
+    } catch (err) {
+      setLoading(false);
+      console.error("❌ Login error:", err);
+      console.error("📥 Response:", err.response?.data);
+      
+      const errorMeta = err.response?.data?.metadata;
+      let errorMessage = "";
+      
+      if (typeof errorMeta === "object" && errorMeta?.message) {
+        errorMessage = errorMeta.message;
+      } else if (typeof errorMeta === "string") {
+        errorMessage = errorMeta;
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else {
+        errorMessage = "Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.";
       }
+      
+      openNotification("error", "Đăng nhập thất bại", errorMessage);
     }
   };
 
   const handleSignUp = async () => {
     const valiPass = validatePass(pass);
     const valiEmail = validateEmail(email);
-    if (!email || !pass || !pass2) {
+    
+    if (!email || !pass) {
       openNotification(
         "error",
         "Lỗi",
@@ -220,26 +238,21 @@ export default function ModalUser({ isOpen, onClose }) {
       );
       return;
     }
-    if (pass !== pass2) {
-      openNotification(
-        "error",
-        "Lỗi",
-        "Mật khẩu và nhập lại mật khẩu không giống nhau !"
-      );
-      return;
-    }
+    
     if (!valiPass.isValid) {
       openNotification(
         "error",
         "Lỗi",
-        "Mật khẩu xác nhận phải đúng định dạng yêu cầu ít nhất 8 ký tự, bao gồm chữ cái, số và ký tự đặc biệt!"
+        "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ cái, số và ký tự đặc biệt!"
       );
       return;
     }
+    
     if (!valiEmail.isValid) {
       openNotification("error", "Lỗi", "Email không đúng định dạng!");
       return;
     }
+    
     try {
       const signupForm = {
         username: email,
@@ -258,40 +271,79 @@ export default function ModalUser({ isOpen, onClose }) {
       }, 700);
       handleRePass();
     } catch (err) {
-      console.error("Lỗi đăng Ký:", err);
-      const errorMeta = err.response?.data?.metadata;
+      setLoading(false);
+      
+      console.error("❌ Lỗi đăng Ký:", err);
+      console.error("📥 Response data:", err.response?.data);
+      console.error("📊 Response status:", err.response?.status);
+      
+      // Parse error message từ nhiều format khác nhau
       let errorMessage = "";
-      if (Array.isArray(errorMeta)) {
-        errorMessage = errorMeta.map((item) => item.message).join("\n");
-      } else if (typeof errorMeta === "object" && errorMeta?.message) {
-        errorMessage = errorMeta.message;
-      } else if (typeof errorMeta === "string") {
-        errorMessage = errorMeta;
-      } else {
-        errorMessage = "Đã xảy ra lỗi không xác định";
+      const responseData = err.response?.data;
+      
+      if (responseData) {
+        // Try metadata first
+        const errorMeta = responseData.metadata;
+        if (Array.isArray(errorMeta)) {
+          errorMessage = errorMeta.map((item) => item.message).join("\n");
+        } else if (typeof errorMeta === "object" && errorMeta?.message) {
+          errorMessage = errorMeta.message;
+        } else if (typeof errorMeta === "string") {
+          errorMessage = errorMeta;
+        }
+        
+        // Try direct message
+        if (!errorMessage && responseData.message) {
+          errorMessage = responseData.message;
+        }
+        
+        // Try error field
+        if (!errorMessage && responseData.error) {
+          errorMessage = typeof responseData.error === 'string' 
+            ? responseData.error 
+            : JSON.stringify(responseData.error);
+        }
+      }
+      
+      // Fallback message
+      if (!errorMessage) {
+        errorMessage = "Đăng ký thất bại. Vui lòng kiểm tra lại thông tin hoặc thử lại sau.";
       }
 
-      openNotification("error", "Thất bại", errorMessage);
+      openNotification("error", "Đăng ký thất bại", errorMessage);
     }
   };
 
   const handleResetPassword = async () => {
+    // Validation
     if (!email) {
-      message.error("Vui lòng nhập email!");
+      openNotification("error", "Lỗi", "Vui lòng nhập email!");
       return;
     }
 
+    const valiEmail = validateEmail(email);
+    if (!valiEmail.isValid) {
+      openNotification("error", "Lỗi", "Email không đúng định dạng!");
+      return;
+    }
+
+    setLoading(true);
     try {
       const res = await appService.resetPassword(email);
+      console.log("✅ OTP sent to:", email);
+      setLoading(false);
       openNotification(
         "success",
         "Thành công",
-        "Yêu cầu đặt lại mật khẩu đã được gửi!"
+        "Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra!"
       );
       setIsOtp(true); // Chuyển sang màn OTP
       setCanResend(false);
-      setCountDown(12);
+      setCountDown(60); // 60 giây để resend
     } catch (err) {
+      setLoading(false);
+      console.error("❌ Send OTP failed:", err);
+      
       const errorMeta = err.response?.data?.metadata;
       let errorMessage = "";
       if (Array.isArray(errorMeta)) {
@@ -300,38 +352,64 @@ export default function ModalUser({ isOpen, onClose }) {
         errorMessage = errorMeta.message;
       } else if (typeof errorMeta === "string") {
         errorMessage = errorMeta;
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
       } else {
-        errorMessage = "Đã xảy ra lỗi không xác định";
+        errorMessage = "Không thể gửi mã OTP. Email có thể không tồn tại trong hệ thống.";
       }
 
-      openNotification("error", "Thất bại", errorMessage);
+      openNotification("error", "Gửi OTP thất bại", errorMessage);
     }
   };
 
   const handleChangePass = async () => {
-    if (np !== np2) {
-      return console.log("sai mat khau");
+    // Validation
+    if (!np || !np2) {
+      openNotification("error", "Lỗi", "Vui lòng nhập đầy đủ mật khẩu!");
+      return;
     }
 
+    if (np !== np2) {
+      openNotification(
+        "error",
+        "Lỗi",
+        "Mật khẩu và nhập lại mật khẩu không khớp!"
+      );
+      return;
+    }
+
+    const valiPass = validatePass(np);
+    if (!valiPass.isValid) {
+      openNotification(
+        "error",
+        "Lỗi",
+        "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ cái, số và ký tự đặc biệt!"
+      );
+      return;
+    }
+
+    setLoading(true);
     const data = {
       email: email,
       newPassword: np,
       confirmPassword: np2,
     };
+    
     try {
       const res = await appService.resetPass(data);
-      console.log(res);
+      console.log("✅ Reset password success:", res);
       openNotification(
         "success",
         "Thành công",
-        "Cập nhật mật khẩu thành công!"
+        "Đặt lại mật khẩu thành công! Vui lòng đăng nhập lại."
       );
       setTimeout(() => {
         setLoading(false);
         window.location.reload();
-      }, 500);
+      }, 1500);
     } catch (error) {
-      console.log(error.response.data.metadata);
+      setLoading(false);
+      console.error("❌ Reset password error:", error);
       const errorMeta = error.response?.data?.metadata;
       let errorMessage = "";
       if (Array.isArray(errorMeta)) {
@@ -349,28 +427,47 @@ export default function ModalUser({ isOpen, onClose }) {
   };
 
   const handleCfOtp = async () => {
+    // Validation
+    if (!saveOtp || saveOtp.length !== 6) {
+      openNotification("error", "Lỗi", "Vui lòng nhập đầy đủ mã OTP 6 số!");
+      return;
+    }
+
+    setLoading(true);
     const formData = {
       email: email,
       otp: saveOtp,
       type: "FORGOT_PASSWORD",
     };
+    
     try {
       const res = await appService.conformOtp(formData);
-      console.log(res);
+      console.log("✅ OTP verified:", res);
+      setLoading(false);
       openNotification(
         "success",
         "Thành công",
-        "Yêu cầu đặt lại mật khẩu đã được gửi!"
+        "Xác thực OTP thành công! Vui lòng đặt mật khẩu mới."
       );
       setIsOtp(false);
       setIsNewPass(true);
     } catch (err) {
-      console.error("Lỗi khi gửi yêu cầu đặt lại mật khẩu:", err);
-      openNotification(
-        "error",
-        "Lỗi",
-        err?.response?.data?.metadata?.message || "Gửi yêu cầu thất bại"
-      );
+      setLoading(false);
+      console.error("❌ OTP verification failed:", err);
+      
+      const errorMeta = err?.response?.data?.metadata;
+      let errorMessage = "";
+      if (typeof errorMeta === "object" && errorMeta?.message) {
+        errorMessage = errorMeta.message;
+      } else if (typeof errorMeta === "string") {
+        errorMessage = errorMeta;
+      } else if (err?.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else {
+        errorMessage = "Mã OTP không chính xác hoặc đã hết hạn!";
+      }
+      
+      openNotification("error", "Xác thực thất bại", errorMessage);
     }
   };
 
@@ -655,27 +752,12 @@ export default function ModalUser({ isOpen, onClose }) {
               </button>
             </div>
 
-            <label>Nhập lại mật khẩu</label>
-            <div className="password-container">
-              <input
-                type={showRePassword ? "text" : "password"}
-                placeholder="Nhập mật khẩu"
-                value={pass2}
-                onChange={(e) => setPass2(e.target.value)}
-              />
-              <button
-                onClick={() => setShowRePassword(!showRePassword)}
-                className="toggle-password"
-              >
-                {showRePassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
-            </div>
             <button
               onClick={handleSignUp}
               className="login-button"
               style={{ marginTop: "10px" }}
             >
-              ĐĂNG Ký
+              ĐĂNG KÝ
             </button>
 
             <div
