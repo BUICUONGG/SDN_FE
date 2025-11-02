@@ -5,61 +5,67 @@ export const appService = {
     return https.post("/Products");
   },
   resetPassword: (email) => {
-    return https.post("/user-service/api/v1/account/forgot-password", {
+    return https.post("/user-service/v1/account/forgot-password", {
       email,
     });
   },
   conformOtp: (formData) => {
-    return https.post("/user-service/api/v1/account/confirm-otp", formData);
+    return https.post("/user-service/v1/account/confirm-otp", formData);
   },
   resendOtp: (data) => {
-    return https.post("/user-service/api/v1/account/resend-otp", data);
+    return https.post("/user-service/v1/account/resend-otp", data);
   },
   getProfile: () => {
-    return https.get("/user-service/api/v1/users/profile");
+    return https.get("/user-service/v1/users/profile");
   },
   updateProfile: (data) => {
-    return https.put("/user-service/api/v1/users", data);
+    return https.put("/user-service/v1/users", data);
   },
   resetPass: (data) => {
-    return https.post("/user-service/api/v1/account/reset-password", data);
+    return https.post("/user-service/v1/account/reset-password", data);
   },
   postAddress: (data) => {
-    return https.post("/user-service/api/v1/users/address/create", data);
+    return https.post("/user-service/v1/users/address/create", data);
   },
   updateAddress: (data) => {
-    return https.put("/user-service/api/v1/users/address/update", data);
+    return https.put("/user-service/v1/users/address/update", data);
   },
   deleteAddress: (id) => {
-    return https.delete(`/user-service/api/v1/users/address/delete/${id}`);
+    return https.delete(`/user-service/v1/users/address/delete/${id}`);
   },
   changePw: (data) => {
-    return https.put("/user-service/api/v1/account/change-password", data);
+    return https.put("/user-service/v1/account/change-password", data);
   },
 
   // product
   getAllCate: () => {
-    return https.get("/product-service/api/v1/categories");
+    return https.get("/product-service/v1/categories");
   },
 
 
   getSubCate: (id) => {
-    return https.get(`/product-service/api/v1/categories/${id}/sub-categories`);
+    return https.get(`/product-service/v1/categories/${id}/sub-categories`);
   },
 
   postProduct: (data) => {
-    return https.post("/product-service/api/v1/products/upsert", data);
+    return https.post("/product-service/v1/products/upsert", data);
   },
 
   postImgPoduct: (id, data) => {
     return https.post(
-      `/product-service/api/v1/products/${id}/upload_images`,
+      `/product-service/v1/products/${id}/upload_images`,
       data
     );
   },
 
   getAllUser: () => https.get("/user"),
-  updateUser: (id, data) => https.put(`/user/${id}`, data),
+  // Lấy user theo id (dành cho admin hoặc khi cần chi tiết theo id)
+  getUserById: (id) => {
+    return https.get(`/user-service/v1/users/${id}`);
+  },
+
+  // Cập nhật user theo id (sử dụng user-service)
+  updateUser: (id, data) => https.put(`/user-service/v1/users/${id}`, data),
   deleteUser: (id) => https.delete(`/user/${id}`),
   getAllReviews: () => https.get("/review"),
   getAllBrands: () => https.get("/brand"),
@@ -84,32 +90,32 @@ export const appService = {
 
 
   searchProducts: (criteria) => {
-    return https.get("/product-service/api/v1/products", {
+    return https.get("/product-service/v1/products", {
       params: criteria,
     });
   },
 
   getAllProductShopId: (shopId, page = 0, pageSize = 10) => {
     return https.get(
-      `/product-service/api/v1/products?currentPage=${page}&pageSize=${pageSize}&shopId=${shopId}`
+      `/product-service/v1/products?currentPage=${page}&pageSize=${pageSize}&shopId=${shopId}`
     );
   },
 
   getOwnerProduct: (page, pageSize) => {
     return https.get(
-      `/product-service/api/v1/products/owner?currentPage=${page}&pageSize=${pageSize}`
+      `/product-service/v1/products/owner?currentPage=${page}&pageSize=${pageSize}`
     );
   },
 
   getAllProductAdmin: (page, pageSize) => {
     return https.get(
-      `/product-service/api/v1/products/admin?currentPage=${page}&pageSize=${pageSize}`
+      `/product-service/v1/products/admin?currentPage=${page}&pageSize=${pageSize}`
     );
   },
 
   updateProductStatus: (id, data) => {
     return https.put(
-      `/product-service/api/v1/products/admin/approve/${id}`,
+      `/product-service/v1/products/admin/approve/${id}`,
       data
     );
   },
@@ -117,13 +123,13 @@ export const appService = {
   updateProductActive: (id, isActive) => {
     console.log(id, isActive);
     return https.put(
-      `/product-service/api/v1/products/${id}/update_status?isActive=${isActive}`
+      `/product-service/v1/products/${id}/update_status?isActive=${isActive}`
     );
   },
 
   // store
   getAllStore: (currentPage, pageSize) => {
-    return https.get("/store-service/api/v1/stores", {
+    return https.get("/store-service/v1/stores", {
       params: { currentPage, pageSize },
       headers: {
         API_SECRET_HEADER: "admin",
@@ -132,20 +138,20 @@ export const appService = {
   },
 
   getDetailStore: (id) => {
-    return https.get(`/store-service/api/v1/stores/detail/${id}`);
+    return https.get(`/store-service/v1/stores/detail/${id}`);
   },
 
   getDetailStoreCus: (id) => {
     console.log(id);
-    return https.get(`/store-service/api/v1/stores/detail/${id}/customer`);
+    return https.get(`/store-service/v1/stores/detail/${id}/customer`);
   },
 
   getDetailStoreUser: () => {
-    return https.get(`/store-service/api/v1/stores/detail`);
+    return https.get(`/store-service/v1/stores/detail`);
   },
 
   updateStoreStatus: (id, data) => {
-    return https.put(`/store-service/api/v1/stores/verify-status/${id}`, data, {
+    return https.put(`/store-service/v1/stores/verify-status/${id}`, data, {
       headers: {
         API_KEY: "EXE",
       },
@@ -153,15 +159,15 @@ export const appService = {
   },
   // admin order
   getAllOrderAD: () => {
-    return https.get(`/order-service/api/v1/dashboard/admin/order-stats`);
+    return https.get(`/order-service/v1/dashboard/admin/order-stats`);
   },
 
   getAllSellerAD: () => {
-    return https.get(`/store-service/api/v1/dashboard/admin/stats`);
+    return https.get(`/store-service/v1/dashboard/admin/stats`);
   },
 
   getAllUserAD: (currentPage = 1, pageSize = 10) => {
-    return https.get(`/user-service/api/v1/dashboard/admin/stats`, {
+    return https.get(`/user-service/v1/dashboard/admin/stats`, {
       params: { currentPage, pageSize },
     });
   },
@@ -169,7 +175,7 @@ export const appService = {
   // payment momo
   CreatePayment: (orderId) => {
     console.log({ orderId });
-    return https.post(`/order-service/api/v1/momo`, { orderId });
+    return https.post(`/order-service/v1/momo`, { orderId });
   },
 
 

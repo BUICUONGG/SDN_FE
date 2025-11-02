@@ -6,32 +6,48 @@ export const localUserService = {
 
   set: (userInfo) => {
     if (userInfo && typeof userInfo === "object") {
-      const metadata = { ...userInfo }; // Clone để tránh mutate
+      // Cho phép nhiều dạng cấu trúc response khác nhau
+      const raw = { ...userInfo };
+      const nestedMeta = raw.metadata || raw.content || {};
 
-      console.log("Dữ liệu gốc:", metadata);
+      // Token ưu tiên theo thứ tự các tên phổ biến
+      const token =
+        raw.token ||
+        raw.accessToken ||
+        raw.access_token ||
+        nestedMeta.token ||
+        nestedMeta.accessToken ||
+        nestedMeta.access_token || null;
 
-      // === LƯU TOKEN RIÊNG (nếu cần dùng nhanh) ===
-      if (metadata.token) {
-        // Lưu trực tiếp mà không mã hóa
-        localStorage.setItem("ACCESS_TOKEN", metadata.token);
+      const refreshToken =
+        raw.refreshToken || nestedMeta.refreshToken || null;
+
+      // UserId theo các tên phổ biến
+      const userId =
+        raw.user_id ||
+        raw.userId ||
+        raw.id ||
+        nestedMeta.user_id ||
+        nestedMeta.userId ||
+        nestedMeta.id || null;
+
+      // Lưu token nếu có
+      if (token) {
+        localStorage.setItem("ACCESS_TOKEN", String(token));
       } else {
-        console.warn("Thiếu token");
+        console.warn("Không tìm thấy access token trong phản hồi đăng nhập");
       }
 
-      // Lưu refresh token nếu có
-      if (metadata.refreshToken) {
-        localStorage.setItem("REFRESH_TOKEN", metadata.refreshToken);
+      if (refreshToken) {
+        localStorage.setItem("REFRESH_TOKEN", String(refreshToken));
       }
 
-      // === LƯU TOÀN BỘ USER INFO (trực tiếp, chuyển thành JSON string) ===
-      const userInfoString = JSON.stringify(metadata); // Chuyển object thành string
-      const userIdString = JSON.stringify(metadata.user_id); // Chuyển object thành string
-      localStorage.setItem("USER_INFO", userInfoString);
-      localStorage.setItem("USER_ID", String(metadata.user_id));
+      if (userId !== null && userId !== undefined) {
+        localStorage.setItem("USER_ID", String(userId));
+      }
 
-      console.log(
-        "Đã lưu USER_INFO + ACCESS_TOKEN vào localStorage (không mã hóa)"
-      );
+      // Lưu toàn bộ object gốc để tra cứu về sau
+      localStorage.setItem("USER_INFO", JSON.stringify(raw));
     } else {
       console.error("Dữ liệu đăng nhập không hợp lệ:", userInfo);
     }

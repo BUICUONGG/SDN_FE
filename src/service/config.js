@@ -4,6 +4,8 @@ import { localUserService } from "./localService";
 export const BASE_URL = process.env.REACT_APP_BASE_URL2;
 export const BASE_URL2 = process.env.REACT_APP_BASE_URL2;
 
+console.log("🔗 BASE_URL:", BASE_URL);
+
 export const configHeader = () => {
     const accessToken = localUserService.getAccessToken();
     return {
@@ -26,10 +28,10 @@ https.interceptors.request.use(
             "/register",
             "/login",
             "/oauth2/authorization",
-            "/user-service/api/v1/account/confirm-otp",
-            "/user-service/api/v1/account/resend-otp",
-            "/user-service/api/v1/account/forgot-password",
-            "/user-service/api/v1/account/reset-password",
+            "/user-service/v1/account/confirm-otp",
+            "/user-service/v1/account/resend-otp",
+            "/user-service/v1/account/forgot-password",
+            "/user-service/v1/account/reset-password",
         ];
         const isExcluded = authExcludedUrls.some((url) => config.url.includes(url));
 

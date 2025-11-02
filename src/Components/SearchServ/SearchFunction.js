@@ -43,7 +43,7 @@ const SearchFunction = () => {
     }}> 
       <Input
         placeholder="Tìm..."
-        bordered={false}
+        variant="borderless"
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onPressEnter={onSearchClick}
