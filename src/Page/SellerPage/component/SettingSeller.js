@@ -53,7 +53,7 @@ export default function SettingSeller() {
 
               <div>
                 <label>Tên cửa hàng</label>
-                <p>Xmark đồ cũ</p>
+                <p>VINE đồ cũ</p>
               </div>
 
               <div>

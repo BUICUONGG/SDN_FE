@@ -131,7 +131,7 @@ const DailyDeals = () => {
                         textOverflow: "ellipsis",
                       }}
                     >
-                      {product.slug}
+                      {product.battery.name}
                     </div>
                   }
                   description={

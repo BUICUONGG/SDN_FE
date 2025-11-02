@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Dropdown, Badge } from "antd";
+import { Button, Dropdown, Badge, message } from "antd";
 import {
   ShoppingCartOutlined,
   PlusOutlined,
@@ -26,10 +26,15 @@ const CartEven = () => {
   }, []);
 
   const updateCart = (newCart) => {
-    localStorage.setItem("cart", JSON.stringify(newCart));
-    window.dispatchEvent(new Event("cart-updated")); // trigger update without reload
-  };
+    // CHỈ CHO PHÉP 1 SẢN PHẨM TRONG GIỎ HÀNG
+    if (newCart.length > 1) {
+      message.error("Chỉ được thêm 1 sản phẩm duy nhất!");
+      return; // Không lưu nếu vượt quá 1
+    }
 
+    localStorage.setItem("cart", JSON.stringify(newCart));
+    window.dispatchEvent(new Event("cart-updated"));
+  };
   const increaseQuantity = (index) => {
     const newCart = [...cartItems];
     newCart[index].quantity += 1;
@@ -102,7 +107,7 @@ const CartEven = () => {
                 type="primary"
                 size="small"
                 onClick={() => (
-                  navigate("/cart")
+                  navigate("/payment")
                 )}
               >
                 Xem tất cả

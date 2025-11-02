@@ -95,7 +95,7 @@ export default function ChatPage() {
           </p>
           {showIntro && (
             <p style={{ color: "black", fontSize: 22, margin: 0 }}>
-              Xin chào, tôi là Trợ lý Xmark! Hôm nay tôi có thể giúp bạn khám
+              Xin chào, tôi là Trợ lý VINE! Hôm nay tôi có thể giúp bạn khám
               phá những món đồ tuyệt vời như thế nào?
             </p>
           )}

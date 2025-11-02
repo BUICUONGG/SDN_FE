@@ -142,7 +142,7 @@ export default function HeaderCart() {
         </span>
         <span style={{ cursor: "pointer" }}> Đóng góp ý kiến</span>
         <span style={{ cursor: "pointer" }}> Hỗ trợ</span>
-        <span style={{ cursor: "pointer" }}> Thay đổi ngôn ngữ</span>
+        {/* <span style={{ cursor: "pointer" }}> Thay đổi ngôn ngữ</span> */}
       </div>
 
       {/* Header chính */}
@@ -173,9 +173,9 @@ export default function HeaderCart() {
               fontWeight: "500",
               transition: "font-size 0.3s ease-in-out",
             }}
-            href="/home"
+            href="/"
           >
-            <span className="font-xmark">xmark</span>
+            <span className="font-xmark">VINE</span>
             <span style={{
               fontSize: "30px",
               marginLeft: "10%",

@@ -4,7 +4,6 @@ import {
   FaEyeSlash,
   FaFacebook,
   FaGoogle,
-  FaTimes,
 } from "react-icons/fa";
 import { localUserService } from "../../service/localService";
 import { userService } from "../../service/userService";
@@ -30,6 +29,12 @@ export default function UserLogin({ onLogin }) {
       message: message,
       description: description,
     });
+  };
+
+  const handleGoogleLogin = () => {
+    // REACT_APP_BASE_URL2
+    const backendURL = process.env.REACT_APP_BASE_URL2 || 'http://localhost:3000/api';
+    window.location.href = `${backendURL}/auth/google`;
   };
 
   const handleLogin = async () => {
@@ -225,15 +230,19 @@ export default function UserLogin({ onLogin }) {
                 justifyContent: "space-evenly",
               }}
             >
-              <button className="social-login google">
+              <button 
+                onClick={handleGoogleLogin} 
+                className="social-login google"
+                type="button"
+              >
                 <FaGoogle style={{ marginRight: "2%" }} /> Google
               </button>
-              <button className="social-login facebook">
+              <button className="social-login facebook" type="button">
                 <FaFacebook style={{ marginRight: "2%" }} /> Facebook
               </button>
             </div>
             <p style={{ textAlign: "left", marginTop: "5%", fontSize: "16px" }}>
-              Bạn mới biết đến xmark lần đầu?{" "}
+              Bạn mới biết đến VINE lần đầu?{" "}
               <span
                 //   onClick={() => setIsDK(true)}
                 style={{

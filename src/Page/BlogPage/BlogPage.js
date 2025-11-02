@@ -16,7 +16,7 @@ export default function BlogPage() {
           fontSize: "13px",
         }}
       >
-        <span>xmark</span> <RiArrowDropLeftFill style={{ fontSize: "32px" }} />{" "}
+        <span>VINE</span> <RiArrowDropLeftFill style={{ fontSize: "32px" }} />{" "}
         <span>Blog</span> <RiArrowDropLeftFill style={{ fontSize: "32px" }} />{" "}
         <span>Màu đen hợp với màu gì? 9 màu phối với màu đen phù hợp nhất</span>
       </div>

@@ -12,6 +12,7 @@ import {
   PhoneOutlined,
   TeamOutlined,
   SettingOutlined,
+  LogoutOutlined,
   DashboardOutlined,
 } from "@ant-design/icons";
 import { localUserService } from "../service/localService";
@@ -34,6 +35,12 @@ export default function NavBarAdmin({ Component }) {
     navigate(`/admin-page/${key}`); // chuyển hướng route
   };
 
+  const handleLogout = () => {
+    localUserService.remove();
+    navigate("/admin-login");
+    window.location.reload();
+  }
+
   const userInfo = localUserService.get();
   if (!userInfo) {
     return <Navigate to="/admin-login" />;
@@ -53,7 +60,7 @@ export default function NavBarAdmin({ Component }) {
         >
           <div
             style={{
-              width: "15%",
+              width: "18%",
               background: "white",
               marginRight: "1%",
               position: "fixed",
@@ -142,7 +149,7 @@ export default function NavBarAdmin({ Component }) {
 
               {/* op4 */}
 
-              <div>
+              {/* <div>
                 <div
                   className={`sidebar-item ${
                     activeKey === "reviews" ? "active" : ""
@@ -166,10 +173,10 @@ export default function NavBarAdmin({ Component }) {
                   </span>
                   <span className="sidebar-label">Hỗ trợ & khiếu nại</span>
                 </div>
-              </div>
+              </div> */}
 
               {/* op5 */}
-              <div>
+              {/* <div>
                 <div
                   className={`sidebar-item ${
                     activeKey === "members" ? "active" : ""
@@ -193,10 +200,18 @@ export default function NavBarAdmin({ Component }) {
                   </span>
                   <span className="sidebar-label">Cài đặt</span>
                 </div>
+              </div> */}
+              {/* logout at end */}
+              <div className="sidebar-item" onClick={handleLogout}>
+                <span className="sidebar-icon">
+                  <LogoutOutlined />
+                </span>
+                <span className="sidebar-label">Đăng xuất</span>
               </div>
             </div>
+            
           </div>
-          <div style={{ width: "100%", paddingLeft: "15%", paddingTop: "10vh" }}>
+          <div style={{ width: "100%", paddingLeft: "18%", paddingTop: "10vh" }}>
             <Component />
           </div>
         </div>

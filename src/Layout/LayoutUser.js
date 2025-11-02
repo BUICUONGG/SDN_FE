@@ -69,7 +69,7 @@ export default function ({ Component }) {
                   setA13(false)
                 }}
               >Hồ Sơ</p>
-              <p className={a2 ? "active" : ""}
+              {/* <p className={a2 ? "active" : ""}
                 onClick={() => {
                 //   navigate('/order');
                   setA1(false);
@@ -85,8 +85,8 @@ export default function ({ Component }) {
                   setA8(false);
                   setA9(false);
                   setA13(false);
-                }}>Ngân hàng</p>
-              <p
+                }}>Ngân hàng</p> */}
+              {/* <p
                 className={a3 ? "active" : ""}
                 onClick={() => {
                   navigate('/settings/address');
@@ -104,8 +104,8 @@ export default function ({ Component }) {
                   setA9(false);
                   setA13(false);
                 }}
-              >Địa chỉ</p>
-              <p
+              >Địa chỉ</p> */}
+              {/* <p
                 className={a4 ? "active" : ""}
                 onClick={() => {
                   navigate('/settings/changepass');
@@ -123,8 +123,8 @@ export default function ({ Component }) {
                   setA9(false);
                   setA13(false);
                 }}
-              >Đổi mật khẩu</p>
-              <p
+              >Đổi mật khẩu</p> */}
+              {/* <p
                 className={a5 ? "active" : ""}
                 onClick={() => {
                   
@@ -142,9 +142,9 @@ export default function ({ Component }) {
                   setA9(false);
                   setA13(false);
                 }}
-              >Cài đặt thông báo</p>
+              >Cài đặt thông báo</p> */}
             </div>
-            <h5>Đơn mua</h5>
+            {/* <h5>Đơn mua</h5>
             <div style={{ marginLeft: '6%', marginTop: '10%'}}>
               <p
                 className={a6 ? "active" : ""}
@@ -164,8 +164,8 @@ export default function ({ Component }) {
                   setA9(false);
                   setA13(false);
                 }}
-              >Tất cả</p>
-              <p
+              >Tất cả</p> */}
+              {/* <p
                 className={a7 ? "active" : ""}
                 onClick={() => {
                 //   navigate('/order');
@@ -183,8 +183,8 @@ export default function ({ Component }) {
                   setA9(false);
                   setA13(false);
                 }}
-              >Chờ thanh toán</p>
-              <p
+              >Chờ thanh toán</p> */}
+              {/* <p
                 className={a8 ? "active" : ""}
                 onClick={() => {
                 //   navigate('/order');
@@ -202,8 +202,8 @@ export default function ({ Component }) {
                   setA9(false);
                   setA13(false);
                 }}
-              >Chờ giao hàng</p>
-              <p
+              >Chờ giao hàng</p> */}
+              {/* <p
                 className={a9 ? "active" : ""}
                 onClick={() => {
                 //   navigate('/order');
@@ -221,8 +221,8 @@ export default function ({ Component }) {
                   setA5(false);
                   setA13(false);
                 }}
-              >Đã giao</p>
-              <p
+              >Đã giao</p> */}
+              {/* <p
                 className={a10 ? "active" : ""}
                 onClick={() => {
                 //   navigate('/order');
@@ -235,13 +235,13 @@ export default function ({ Component }) {
                   setA7(false);
                   setA12(false);
                   setA11(false);
-                  setA5(false);
-                  setA8(false);
                   setA9(false);
+                  setA8(false);
+                  setA5(false);
                   setA13(false);
                 }}
-              >Đã hủy</p>
-              <p
+              >Đã hủy</p> */}
+              {/* <p
                 className={a11 ? "active" : ""}
                 onClick={() => {
                 //   navigate('/order');
@@ -259,9 +259,9 @@ export default function ({ Component }) {
                   setA9(false);
                   setA13(false);
                 }}
-              >Trả lại</p>
-            </div>
-            <h5>Voucher</h5>
+              >Trả lại</p> */}
+            {/* </div>
+            <h5>Voucher</h5> */}
           </div>
           <div
             style={{

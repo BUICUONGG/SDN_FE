@@ -63,7 +63,7 @@ export default function DetailProduct() {
   const handleAddToCart = () => {
     const cartProduct = {
       id: product._id,
-      name: product.productName || `Pin ${product.battery[0]?.name}`,
+      name: product.slug || `Pin ${product.slug}`,
       price: product.price,
       image: product.image_url?.[0] || "/default-battery.jpg",
       quantity: 1,
@@ -78,7 +78,7 @@ export default function DetailProduct() {
   const handleBuyNow = () => {
     const cartProduct = {
       id: product._id,
-      name: product.productName || `Pin ${product.battery[0]?.name}`,
+      name: product.slug || `Pin ${product.slug}`,
       price: product.price,
       image: product.image_url?.[0] || "/default-battery.jpg",
       quantity: 1,
@@ -268,7 +268,7 @@ export default function DetailProduct() {
           {/* Product Info */}
           <div style={{ flex: 1 }}>
             <h1 style={{ fontSize: "26px", fontWeight: "700", margin: "0 0 12px", color: "#1a1a1a" }}>
-              {battery.name}
+              {product.battery.name}
             </h1>
 
             {vehicle.name && (
@@ -295,15 +295,15 @@ export default function DetailProduct() {
               <div
                 style={{
                   background:
-                    battery.healthPercentage >= 80
+                    product.battery.healthPercentage >= 80
                       ? "#d4edda"
-                      : battery.healthPercentage >= 70
+                      : product.battery.healthPercentage >= 70
                       ? "#fff3cd"
                       : "#f8d7da",
                   color:
-                    battery.healthPercentage >= 80
+                    product.battery.healthPercentage >= 80
                       ? "#155724"
-                      : battery.healthPercentage >= 70
+                      : product.battery.healthPercentage >= 70
                       ? "#856404"
                       : "#721c24",
                   padding: "8px 16px",
@@ -312,12 +312,12 @@ export default function DetailProduct() {
                   fontSize: "15px",
                 }}
               >
-                SOH: {battery.healthPercentage}%
+                SOH: {product.battery.healthPercentage}%
               </div>
               <span style={{ fontSize: "14px", color: "#555" }}>
-                {battery.healthPercentage >= 80
+                {product.battery.healthPercentage >= 80
                   ? "Xuất sắc"
-                  : battery.healthPercentage >= 70
+                  : product.battery.healthPercentage >= 70
                   ? "Tốt"
                   : "Cần kiểm tra"}
               </span>
@@ -338,10 +338,10 @@ export default function DetailProduct() {
                 fontSize: "14.5px",
               }}
             >
-              <SpecItem icon={<IoBatteryCharging />} label="Dung lượng" value={`${battery.capacity} kWh`} />
-              <SpecItem icon={<IoSpeedometerOutline />} label="Tầm vận hành" value={`${battery.rangePerChange} km`} />
-              <SpecItem icon={<IoRepeatOutline />} label="Chu kỳ sạc" value={`${battery.changeCycles} lần`} />
-              <SpecItem icon={<IoConstructOutline />} label="Điện áp" value={`${battery.voltage} V`} />
+              <SpecItem icon={<IoBatteryCharging />} label="Dung lượng" value={`${product.battery.capacity} kWh`} />
+              <SpecItem icon={<IoSpeedometerOutline />} label="Tầm vận hành" value={`${product.battery.rangePerChange} km`} />
+              <SpecItem icon={<IoRepeatOutline />} label="Chu kỳ sạc" value={`${product.battery.changeCycles} lần`} />
+              <SpecItem icon={<IoConstructOutline />} label="Điện áp" value={`${product.battery.voltage} V`} />
               {vehicle.mileage && (
                 <SpecItem icon={<IoSpeedometerOutline />} label="Km đã đi" value={`${vehicle.mileage.toLocaleString()} km`} />
               )}
@@ -351,42 +351,42 @@ export default function DetailProduct() {
             </div>
 
             <div style={{ marginBottom: "20px" }}>
-              <p style={{ fontSize: "15px", fontWeight: "600", color: battery.is_active ? "#2e7d32" : "#c62828" }}>
-                {battery.is_active ? "Còn hàng" : "Hết hàng"}
+              <p style={{ fontSize: "15px", fontWeight: "600", color: product.battery.is_active ? "#2e7d32" : "#c62828" }}>
+                {product.battery.is_active ? "Còn hàng" : "Hết hàng"}
               </p>
             </div>
 
             <div style={{ display: "flex", gap: "12px", marginBottom: "24px" }}>
               <button
                 onClick={handleAddToCart}
-                disabled={!battery.is_active}
+                disabled={!product.battery.is_active}
                 style={{
                   flex: 1,
                   padding: "14px",
                   fontSize: "15px",
                   fontWeight: "600",
                   border: "2px solid #28a745",
-                  background: !battery.is_active ? "#f5f5f5" : "#fff",
-                  color: !battery.is_active ? "#999" : "#28a745",
+                  background: !product.battery.is_active ? "#f5f5f5" : "#fff",
+                  color: !product.battery.is_active ? "#999" : "#28a745",
                   borderRadius: "10px",
-                  cursor: !battery.is_active ? "not-allowed" : "pointer",
+                  cursor: !product.battery.is_active ? "not-allowed" : "pointer",
                 }}
               >
                 THÊM VÀO GIỎ
               </button>
               <button
                 onClick={handleBuyNow}
-                disabled={!battery.is_active}
+                disabled={!product.battery.is_active}
                 style={{
                   flex: 1,
                   padding: "14px",
                   fontSize: "15px",
                   fontWeight: "600",
-                  background: !battery.is_active ? "#ccc" : "#28a745",
+                  background: !product.battery.is_active ? "#ccc" : "#28a745",
                   color: "#fff",
                   border: "none",
                   borderRadius: "10px",
-                  cursor: !battery.is_active ? "not-allowed" : "pointer",
+                  cursor: !product.battery.is_active ? "not-allowed" : "pointer",
                 }}
               >
                 MUA NGAY
@@ -578,10 +578,6 @@ export default function DetailProduct() {
             <SpecRow label="Trạng thái" value={product.is_active === "complete" ? "Hoàn tất" : product.is_active} />
           </Section>
         </div>
-      </div>
-
-      <div style={{ marginTop: "32px" }}>
-        <OrtherProductShop />
       </div>
       <div style={{ marginTop: "32px" }}>
         <ProductLike />

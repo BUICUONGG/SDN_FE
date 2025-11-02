@@ -108,7 +108,7 @@ export default function InfoUser() {
       {/* Header */}
       <div className="header-intro">
         <div className="header-container">
-          <span className="font-xmark">xmark</span>
+          <span className="font-xmark">VINE</span>
           {(dt || ip) && (
             <div className="header-right">
             
@@ -177,7 +177,7 @@ export default function InfoUser() {
                 fontWeight: "300",
               }}
             >
-              Khám phá xu hướng thời trang mới nhất từ xmark. Nâng tầm tủ đồ của
+              Khám phá xu hướng thời trang mới nhất từ VINE. Nâng tầm tủ đồ của
               bạn với những bộ <br /> sưu tập ấn tượng của chúng tôi
             </span>
           )}
@@ -190,7 +190,7 @@ export default function InfoUser() {
                 fontWeight: "300",
               }}
             >
-              Khám phá xu hướng thời trang mới nhất từ xmark. Nâng tầm tủ đồ của
+              Khám phá xu hướng thời trang mới nhất từ VINE. Nâng tầm tủ đồ của
               bạn với những bộ <br /> sưu tập ấn tượng của chúng tôi
             </span>
           )}
@@ -203,7 +203,7 @@ export default function InfoUser() {
                 fontWeight: "300",
               }}
             >
-              Khám phá xu hướng thời trang mới nhất từ xmark. Nâng tầm tủ đồ của
+              Khám phá xu hướng thời trang mới nhất từ VINE. Nâng tầm tủ đồ của
               bạn với những bộ sưu tập ấn tượng của chúng tôi
             </span>
           )}
@@ -216,7 +216,7 @@ export default function InfoUser() {
                 fontWeight: "300",
               }}
             >
-              Khám phá xu hướng thời trang mới nhất từ xmark. Nâng tầm tủ đồ của
+              Khám phá xu hướng thời trang mới nhất từ VINE. Nâng tầm tủ đồ của
               bạn với những bộ sưu tập ấn tượng của chúng tôi
             </span>
           )}

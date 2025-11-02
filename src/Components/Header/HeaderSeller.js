@@ -99,7 +99,7 @@ export default function HeaderSeller() {
             }}
             href="/home"
           >
-            <span className="font-xmark">xmark</span>
+            <span className="font-xmark">VINE</span>
           </a>
           <p
             style={{

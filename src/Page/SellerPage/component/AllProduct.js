@@ -160,7 +160,7 @@ export default function AllProduct() {
           <TabPane tab="Tất cả" key="all" />
           <TabPane tab="Đang hoạt động" key="active" />
           <TabPane tab="Vi phạm" key="violations" />
-          <TabPane tab="Chờ duyệt bởi Xmark" key="pending" />
+          <TabPane tab="Chờ duyệt bởi VINE" key="pending" />
           <TabPane tab="Chưa được đăng" key="unlisted" />
         </Tabs>
 
