@@ -79,6 +79,12 @@ export const appService = {
   getAllProduct: () => {
     return https.get(`/product`);
   },
+  createProduct: (data) => {
+    return https.post(`/product`, data);
+  },
+  deleteProduct: (id) => {
+    return https.delete(`/product/${id}`);
+  },
 
   createBrand: (data) => https.post(`/brand`, data),
   updateBrand: (id, data) => https.put(`/brand/${id}`, data),
@@ -86,8 +92,16 @@ export const appService = {
   createCategory: (data) => https.post(`/category`, data),
   updateCategory: (id, data) => https.put(`/category/${id}`, data),
   deleteCategory: (id) => https.delete(`/category/${id}`),
+  getAutions: () => https.get(`/auctions`),
+  getAutionDetail: (id) => https.get(`/auctions/${id}`),
+  postAutionBid: (id, bidAmount) => https.post(`/auctions/${id}/bid`,{ bid_amount: bidAmount }),
 
+  getWalletBalance: () => https.get('/wallet/balance'),
+  depositToWallet: (amount) => https.post('/wallet/deposit', { amount }),
+  withdrawFromWallet: (amount) => https.post('/wallet/withdraw', { amount }),
+  bidAuction: (auctionId, amount) => https.post(`/auctions/${auctionId}/bid`, { amount }),
 
+  getTransactionHistory: () => https.get('/wallet/transactions'),
 
   searchProducts: (criteria) => {
     return https.get("/product-service/v1/products", {
@@ -169,6 +183,12 @@ export const appService = {
   getAllUserAD: (currentPage = 1, pageSize = 10) => {
     return https.get(`/user-service/v1/dashboard/admin/stats`, {
       params: { currentPage, pageSize },
+    });
+  },
+
+  getStats: (filter) => {
+    return https.get(`/stats`, {
+      params: filter ? { filter } : {},
     });
   },
 

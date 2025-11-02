@@ -39,53 +39,13 @@ import h6 from "../../../img/dashboardAd/fa202757c43a4d64142b.jpg";
 import { FaRegCommentDots } from "react-icons/fa";
 import axios from "axios";
 
-const datatt = [
-  { name: "14 tháng 7", truyCap: 5 },
-  { name: "15 tháng 7", truyCap: 12 },
-  { name: "16 tháng 7", truyCap: 2 },
-  { name: "17 tháng 7", truyCap: 2 },
-  { name: "18 tháng 7", truyCap: 10 },
-  { name: "19 tháng 7", truyCap: 13 },
-  { name: "20 tháng 7", truyCap: 8 },
-];
-
-const allData = {
-  "6months": [
-    { name: "Tháng 01", truyCap: 4000, doanhThu: 2400 },
-    { name: "Tháng 02", truyCap: 3000, doanhThu: 1398 },
-    { name: "Tháng 03", truyCap: 2000, doanhThu: 9800 },
-    { name: "Tháng 04", truyCap: 2780, doanhThu: 3908 },
-    { name: "Tháng 05", truyCap: 1890, doanhThu: 4800 },
-    { name: "Tháng 06", truyCap: 2390, doanhThu: 3800 },
-  ],
-  "12months": [
-    { name: "Tháng 01", truyCap: 4000, doanhThu: 2400 },
-    { name: "Tháng 02", truyCap: 3000, doanhThu: 1398 },
-    { name: "Tháng 03", truyCap: 2000, doanhThu: 9800 },
-    { name: "Tháng 04", truyCap: 2780, doanhThu: 3908 },
-    { name: "Tháng 05", truyCap: 1890, doanhThu: 4800 },
-    { name: "Tháng 06", truyCap: 2390, doanhThu: 3800 },
-    { name: "Tháng 07", truyCap: 3490, doanhThu: 4300 },
-    { name: "Tháng 08", truyCap: 3000, doanhThu: 3600 },
-    { name: "Tháng 09", truyCap: 2500, doanhThu: 4000 },
-    { name: "Tháng 10", truyCap: 2700, doanhThu: 4200 },
-    { name: "Tháng 11", truyCap: 3200, doanhThu: 4100 },
-    { name: "Tháng 12", truyCap: 3600, doanhThu: 4700 },
-  ],
-  "2years": [
-    { name: "Năm 1", truyCap: 18000, doanhThu: 10400 },
-    { name: "Năm 2", truyCap: 22000, doanhThu: 14000 },
-  ],
-};
-
 export default function Dashboard() {
-  const [timeRange, setTimeRange] = useState("6months");
-  const [totalSeller, setTotalSeller] = useState([]);
-  const [data, setData] = useState([]);
-  const [data1, setData1] = useState([]);
+  const [timeRange, setTimeRange] = useState("month");
+  const [stats, setStats] = useState(null);
+  const [chartData, setChartData] = useState([]);
   const [videos, setVideos] = useState([]);
   const [videos1, setVideos1] = useState([]);
-  const [loading, setLoading] = useState(true); // Optional: loading state
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const TIKTOK_REFRESH_TOKEN =
@@ -119,26 +79,37 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    appService
-      .getAllSellerAD()
-      .then((res) => {
-        setTotalSeller(res.data.metadata);
-      })
-      .catch((err) => {
-        console.error("Error fetching stores:", err);
-      });
-  }, []);
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        const filter = timeRange === "all" ? undefined : timeRange;
+        const res = await appService.getStats(filter);
+        setStats(res.data);
+        
+        if (res.data?.chartData) {
+          setChartData(res.data.chartData);
+        } else {
+          const currentData = res.data?.current || {};
+          setChartData([
+            {
+              name: res.data?.period || "Hiện tại",
+              donDat: currentData.orders || 0,
+              doanhThu: currentData.revenue || 0,
+            }
+          ]);
+        }
+        
+        console.log("📊 Stats data:", res.data);
+      } catch (err) {
+        console.error("Error fetching stats:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  useEffect(() => {
-    appService
-      .getAllOrderAD()
-      .then((res) => {
-        setData(res.data.metadata);
-      })
-      .catch((err) => {
-        console.error("Error fetching stores:", err);
-      });
-  }, []);
+    fetchStats();
+  }, [timeRange]);
 
 
   useEffect(() => {
@@ -197,17 +168,6 @@ export default function Dashboard() {
 
   console.log(videos1);
 
-  useEffect(() => {
-    appService
-      .getAllUserAD()
-      .then((res) => {
-        setData1(res.data.metadata);
-      })
-      .catch((err) => {
-        console.error("Error fetching stores:", err);
-      });
-  }, []);
-
   const handleChangeRange = (e) => {
     setTimeRange(e.target.value);
   };
@@ -236,7 +196,7 @@ export default function Dashboard() {
               fontSize: "15px",
             }}
           >
-            Người bán
+            Sản phẩm
           </p>
           <div
             style={{
@@ -251,11 +211,11 @@ export default function Dashboard() {
                 fontWeight: "600",
               }}
             >
-              {totalSeller.totalSellers}
+              {loading ? "..." : stats?.current?.products || 0}
             </span>
             <span
               style={{
-                color: "green",
+                color: stats?.growth?.products >= 0 ? "green" : "red",
                 fontSize: "12px",
                 marginLeft: "5px",
                 padding: "2px 5px",
@@ -263,7 +223,8 @@ export default function Dashboard() {
                 borderRadius: "5px",
               }}
             >
-              <BsArrowUp /> 7.34%
+              {stats?.growth?.products >= 0 ? <BsArrowUp /> : <BsArrowDown />} 
+              {stats?.growth?.products || 0}%
             </span>
           </div>
         </div>
@@ -296,11 +257,11 @@ export default function Dashboard() {
                 fontWeight: "600",
               }}
             >
-              {data1.total}
+              {loading ? "..." : stats?.current?.users || 0}
             </span>
             <span
               style={{
-                color: "green",
+                color: stats?.growth?.users >= 0 ? "green" : "red",
                 fontSize: "12px",
                 marginLeft: "5px",
                 padding: "2px 5px",
@@ -308,52 +269,8 @@ export default function Dashboard() {
                 borderRadius: "5px",
               }}
             >
-              <BsArrowUp /> 7.34%
-            </span>
-          </div>
-        </div>
-        <div className="stat-card">
-          <BsCartFill
-            style={{
-              height: "37px",
-              width: "37px",
-              color: "#43903A",
-            }}
-          />
-          <p
-            style={{
-              margin: "0",
-              fontSize: "15px",
-            }}
-          >
-            Đơn hàng
-          </p>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "24px",
-                fontWeight: "600",
-              }}
-            >
-              {data.totalOrders}
-            </span>
-            <span
-              style={{
-                color: "green",
-                fontSize: "12px",
-                marginLeft: "5px",
-                padding: "2px 5px",
-                backgroundColor: "#e6f7ff",
-                borderRadius: "5px",
-              }}
-            >
-              <BsArrowUp /> 7.34%
+              {stats?.growth?.users >= 0 ? <BsArrowUp /> : <BsArrowDown />} 
+              {stats?.growth?.users || 0}%
             </span>
           </div>
         </div>
@@ -386,14 +303,14 @@ export default function Dashboard() {
                 fontWeight: "600",
               }}
             >
-              {data.totalPrice?.toLocaleString("vi-VN", {
+              {loading ? "..." : (stats?.current?.revenue || 0).toLocaleString("vi-VN", {
                 style: "currency",
                 currency: "VND",
               })}
             </span>
             <span
               style={{
-                color: "red",
+                color: stats?.growth?.revenue >= 0 ? "green" : "red",
                 fontSize: "12px",
                 marginLeft: "5px",
                 padding: "2px 5px",
@@ -401,7 +318,54 @@ export default function Dashboard() {
                 borderRadius: "5px",
               }}
             >
-              <BsArrowDown /> 7.34%
+              {stats?.growth?.revenue >= 0 ? <BsArrowUp /> : <BsArrowDown />} 
+              {stats?.growth?.revenue || 0}%
+            </span>
+          </div>
+        </div>
+        <div className="stat-card">
+          <BsCartFill
+            style={{
+              height: "37px",
+              width: "37px",
+              color: "#43903A",
+            }}
+          />
+          <p
+            style={{
+              margin: "0",
+              fontSize: "15px",
+            }}
+          >
+            Đơn đặt hàng
+          </p>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <span
+              style={{
+                fontSize: "24px",
+                fontWeight: "600",
+              }}
+            >
+              {loading ? "..." : stats?.current?.orders || 0}
+            </span>
+            <span
+              style={{
+                color: stats?.growth?.orders >= 0 ? "green" : "red",
+                fontSize: "12px",
+                marginLeft: "5px",
+                padding: "2px 5px",
+                backgroundColor: "#e6f7ff",
+                borderRadius: "5px",
+              }}
+            >
+              {stats?.growth?.orders >= 0 ? <BsArrowUp /> : <BsArrowDown />} 
+              {stats?.growth?.orders || 0}%
             </span>
           </div>
         </div>
@@ -441,29 +405,41 @@ export default function Dashboard() {
               onChange={handleChangeRange}
               className="range-select"
             >
-              <option value="6months">6 tháng</option>
-              <option value="12months">12 tháng</option>
-              <option value="2years">2 năm</option>
+              <option value="week">Tuần này</option>
+              <option value="month">Tháng này</option>
+              <option value="all">Tất cả</option>
             </select>
           </div>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={allData[timeRange]}>
+            <LineChart data={chartData}>
               <Line
                 type="monotone"
-                dataKey="truyCap"
+                dataKey="donDat"
                 stroke="#FF4C4C"
-                name="Lượt truy cập"
+                name="Số đơn đặt"
+                strokeWidth={2}
               />
               <Line
                 type="monotone"
                 dataKey="doanhThu"
                 stroke="#00C49F"
-                name="Doanh thu"
+                name="Doanh thu (VND)"
+                strokeWidth={2}
               />
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
-              <Tooltip />
+              <Tooltip 
+                formatter={(value, name) => {
+                  if (name === "Doanh thu (VND)") {
+                    return value.toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    });
+                  }
+                  return value;
+                }}
+              />
               <Legend />
             </LineChart>
           </ResponsiveContainer>
@@ -483,7 +459,7 @@ export default function Dashboard() {
                 fontWeight: "600",
               }}
             >
-              {data.totalPrice?.toLocaleString("vi-VN", {
+              {loading ? "..." : (stats?.current?.revenue || 0).toLocaleString("vi-VN", {
                 style: "currency",
                 currency: "VND",
               })}
@@ -527,7 +503,7 @@ export default function Dashboard() {
                       color: "white",
                     }}
                   >
-                    {data.totalPrice?.toLocaleString("vi-VN", {
+                    {loading ? "..." : (stats?.current?.revenue || 0).toLocaleString("vi-VN", {
                       style: "currency",
                       currency: "VND",
                     })}
@@ -618,7 +594,7 @@ export default function Dashboard() {
                   margin: "0",
                 }}
               >
-                {data.totalPrice?.toLocaleString("vi-VN", {
+                {loading ? "..." : (stats?.current?.revenue || 0).toLocaleString("vi-VN", {
                   style: "currency",
                   currency: "VND",
                 })}

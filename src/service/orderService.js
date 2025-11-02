@@ -7,7 +7,7 @@ export const orderService = {
   },
 
   getAllOrder: (criteria) => {
-    
+    return https.get("/orders");
   },
 
   conformOrderRoot: ({ orderCode, paymentType }) => {
@@ -23,8 +23,8 @@ export const orderService = {
   },
 
   getOrder: (criteria) => {
-    return https.get("/order-service/v1/orders/customer",{
-      params: criteria, 
+    return https.get("/order-service/v1/orders/customer", {
+      params: criteria,
     });
   },
 
@@ -35,5 +35,4 @@ export const orderService = {
   conformOrder: (orderCode) => {
     return https.put(`/order-service/v1/orders/${orderCode}/approve-by-shop`);
   },
-
 };
