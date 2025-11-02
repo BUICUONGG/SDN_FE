@@ -11,6 +11,7 @@
     "bootstrap": "^5.3.3",
     "cra-template": "1.2.0",
     "crypto-js": "^4.2.0",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.18",
     "firebase": "^11.3.0",
     "framer-motion": "^12.4.10",
@@ -56,5 +57,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/date-fns": "^2.5.3"
   }
 }

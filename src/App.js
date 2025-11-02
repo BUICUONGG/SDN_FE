@@ -8,7 +8,6 @@ import LayoutUser from "./Layout/LayoutUser";
 import ProtectedRoute from "./Components/Protectedroute/ProtectedRoute";
 import LoginPageTest from "./Page/AdminPage/LoginPageTest";
 import AddressPage from "./Page/UserPage/AddressPage";
-import InfoUser from "./Page/InfoUser/InfoUser";
 import RegisterSeller from "./Page/SellerPage/RegisterSeller";
 import { notification } from "antd";
 import ChangePass from "./Page/UserPage/ChangePass";
@@ -21,7 +20,6 @@ import SellerPage from "./Page/SellerPage/SellerPage";
 import Payment from "./Page/Payment/Payment";
 import InvationBuy from "./Page/UserPage/InvationBuy";
 import PaymentTest from "./Page/Payment/PaymentTest";
-import ChatTest from "./Components/ChatBox/ChatTest";
 import NavbarSellerWrap from "./Page/SellerPage/NavbarSeller";
 import LayoutCart from "./Layout/LayoutCart";
 import LayoutPayment from "./Layout/LayoutPayment";
@@ -36,6 +34,7 @@ import PaymentNow from "./Page/Payment/PaymentNow";
 import SearchResults from "./Page/SearchPage/SearchResults";
 import OAuth2RedirectHandler from "./Page/OAuth2RedirectHandler";
 import AutionPage from "./Page/AutionPage/AutionPage";
+import AuctionDetail from "./Page/AutionPage/AutionDetail";
 
 function App() {
   // eslint-disable-next-line no-unused-vars
@@ -126,6 +125,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout Component={HomePage} />} />
           <Route path="/auction-channel" element={<Layout Component={AutionPage} />} />
+          <Route path="/auction-channel/detail/:id" element={<Layout Component={AuctionDetail} />} />
           <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
           <Route path="/auth/google/callback" element={<OAuth2RedirectHandler />} />
           <Route path="/register-seller" element={<Layout Component={RegisterSeller} />} />
@@ -140,7 +140,6 @@ function App() {
           <Route path="/payment-now" element={<LayoutPayment Component={PaymentNow} />} />
           <Route path="/admin-login" element={<LayoutAdmin Component={AdminPage} />} />
           <Route path="*" element={<ErrorPage />} />
-          {/* <Route path="/" element={<InfoUser />} /> */}
           <Route path="/1" element={<LoginPageTest />} />
           <Route path="/2" element={<FancyLoadingPage />} />
           <Route path="/search" element={<Layout Component={SearchResults} />} />
