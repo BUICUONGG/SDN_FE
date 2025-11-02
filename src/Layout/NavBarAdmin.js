@@ -53,7 +53,7 @@ export default function NavBarAdmin({ Component }) {
         >
           <div
             style={{
-              width: "15%",
+              width: "18%",
               background: "white",
               marginRight: "1%",
               position: "fixed",
@@ -196,7 +196,7 @@ export default function NavBarAdmin({ Component }) {
               </div>
             </div>
           </div>
-          <div style={{ width: "100%", paddingLeft: "15%", paddingTop: "10vh" }}>
+          <div style={{ width: "100%", paddingLeft: "18%", paddingTop: "10vh" }}>
             <Component />
           </div>
         </div>

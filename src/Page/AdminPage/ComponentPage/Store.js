@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Input,
   Button,
@@ -34,7 +34,6 @@ import {
 } from "@ant-design/icons";
 import { Battery } from "lucide-react";
 import { appService } from "../../../service/appService";
-import { useNavigate } from "react-router-dom";
 
 const { Text, Title } = Typography;
 const { Option } = Select;
@@ -91,6 +90,7 @@ export default function ProductManagement() {
     open: false,
     product: null,
   });
+  const [selectedImage, setSelectedImage] = useState("");
   const [formModal, setFormModal] = useState({
     open: false,
     product: null,
@@ -103,8 +103,6 @@ export default function ProductManagement() {
   const [categories, setCategories] = useState([]);
   const [users, setUsers] = useState([]); // Đã sửa: setUser → setUsers
   const [loadingOptions, setLoadingOptions] = useState(false);
-
-  const navigate = useNavigate();
 
   // Tải Brands & Categories
   useEffect(() => {
@@ -252,15 +250,23 @@ export default function ProductManagement() {
   // Mở modal chi tiết
   const openDetail = (product) => setDetailModal({ open: true, product });
 
+  useEffect(() => {
+    if (detailModal.product) {
+      const first = detailModal.product.image_url?.[0] || "/default-battery.jpg";
+      setSelectedImage(first);
+    }
+  }, [detailModal.product]);
+
   // Mở modal form (add/edit)
   const openForm = (mode, product = null) => {
     setFormModal({ open: true, mode, product });
 
     if (mode === "edit" && product) {
       form.setFieldsValue({
-        name: product.name,
         slug: product.slug,
         price: product.price,
+        stock: product.stock || 0,
+        image_url: product.image_url?.join('\n') || '',
         is_active: product.is_active || "pending",
         published_at: product.published_at
           ? new Date(product.published_at).toISOString().slice(0, 16)
@@ -271,14 +277,14 @@ export default function ProductManagement() {
 
         // Battery
         battery: {
-          name: product.battery?.[0]?.name || "",
-          slug: product.battery?.[0]?.slug || "",
-          capacity: product.battery?.[0]?.capacity || 0,
-          voltage: product.battery?.[0]?.voltage || 0,
-          healthPercentage: product.battery?.[0]?.healthPercentage || 0,
-          changeCycles: product.battery?.[0]?.changeCycles || 0,
-          rangePerChange: product.battery?.[0]?.rangePerChange || 0,
-          is_active: product.battery?.[0]?.is_active ?? true,
+          name: product.battery?.name || product.battery?.[0]?.name || "",
+          slug: product.battery?.slug || product.battery?.[0]?.slug || "",
+          capacity: product.battery?.capacity || product.battery?.[0]?.capacity || 0,
+          voltage: product.battery?.voltage || product.battery?.[0]?.voltage || 0,
+          healthPercentage: product.battery?.healthPercentage || product.battery?.[0]?.healthPercentage || 0,
+          changeCycles: product.battery?.changeCycles || product.battery?.[0]?.changeCycles || 0,
+          rangePerChange: product.battery?.rangePerChange || product.battery?.[0]?.rangePerChange || 0,
+          is_active: product.battery?.is_active ?? product.battery?.[0]?.is_active ?? true,
         },
 
         // Vehicle
@@ -296,11 +302,16 @@ export default function ProductManagement() {
       });
     } else {
       form.resetFields();
-      // Tự động điền người tạo hiện tại (giả lập)
+      // Tự động điền người tạo hiện tại
       const currentUserId =
-        localStorage.getItem("currentUserId") || "69031fcd349acaa3e2b94bbe";
+        localStorage.getItem("USER_ID") || "69031fcd349acaa3e2b94bbe";
       form.setFieldsValue({
         creater: currentUserId,
+        stock: 0,
+        is_active: "pending",
+        battery: {
+          is_active: true,
+        },
       });
     }
   };
@@ -319,26 +330,28 @@ export default function ProductManagement() {
       .validateFields()
       .then((values) => {
         const payload = {
-          name: values.name,
+          // name: sử dụng battery name làm product name
           slug: values.slug,
           price: values.price,
+          stock: values.stock || 0,
+          image_url: values.image_url 
+            ? values.image_url.split('\n').map(url => url.trim()).filter(url => url) 
+            : [],
           is_active: values.is_active,
           published_at: values.published_at || new Date().toISOString(),
           creater: values.creater, // Đã có ID người dùng
           brand: values.brand,
           category: values.category,
-          battery: [
-            {
-              name: values.battery.name,
-              slug: values.battery.slug || generateSlug(values.battery.name),
-              capacity: values.battery.capacity,
-              voltage: values.battery.voltage,
-              healthPercentage: values.battery.healthPercentage,
-              changeCycles: values.battery.changeCycles,
-              rangePerChange: values.battery.rangePerChange,
-              is_active: values.battery.is_active,
-            },
-          ],
+          battery: {
+            name: values.battery.name,
+            slug: values.battery.slug || generateSlug(values.battery.name),
+            capacity: values.battery.capacity,
+            voltage: values.battery.voltage,
+            healthPercentage: values.battery.healthPercentage,
+            changeCycles: values.battery.changeCycles,
+            rangePerChange: values.battery.rangePerChange,
+            is_active: values.battery.is_active,
+          },
           vehicle:
             values.vehicle?.map((v) => ({
               name: v.name,
@@ -393,8 +406,8 @@ export default function ProductManagement() {
 
   const getCreatorName = (creatorId) => {
     console.log(creatorId);
-    const user = users.find((u) => u._id === creatorId); // Đã sửa: userss → users
-    return user ? user.username : "Không xác định";
+    const user = users.find((u) => u._id === creatorId);
+    return user?.user_profile?.name || user?.username || "Không xác định";
   };
 
   const renderStars = (rating) => {
@@ -457,7 +470,6 @@ export default function ProductManagement() {
         ) : (
           filteredProducts.map((product) => {
             const statusColor = statusColorMap[product.is_active] || "default";
-            const battery = product.battery?.[0];
 
             return (
               <Card
@@ -473,24 +485,24 @@ export default function ProductManagement() {
                     <Space direction="vertical" size={4}>
                       <Space align="center">
                         <Title level={5} style={{ margin: 0 }}>
-                          {product.slug || "Chưa đặt tên"}
+                          {product.battery.name || "Chưa đặt tên"}
                         </Title>
                         <Tag color={statusColor}>
                           {String(product.is_active || "unknown").toUpperCase()}
                         </Tag>
                       </Space>
 
-                      {battery && (
+                      {product.battery && (
                         <Space
                           size="small"
                           style={{ fontSize: 12, color: "#666" }}
                         >
                           <Battery style={{ color: "#52c41a" }} />
-                          <Text strong>{battery.capacity} kWh</Text>
+                          <Text strong>{product.battery.capacity} kWh</Text>
                           <Text type="secondary">
-                            • SOH: {battery.healthPercentage}%
+                            • SOH: {product.battery.healthPercentage}%
                           </Text>
-                          <Text>• {battery.rangePerChange} km</Text>
+                          <Text>• {product.battery.rangePerChange} km</Text>
                         </Space>
                       )}
 
@@ -611,46 +623,79 @@ export default function ProductManagement() {
       >
         {detailModal.product && (
           <>
-            <Descriptions
-              bordered
-              column={2}
-              size="small"
-              style={{ marginBottom: 16 }}
-            >
-              <Descriptions.Item label="Tên" span={2}>
-                <strong>{detailModal.product.slug}</strong>
-              </Descriptions.Item>
-              <Descriptions.Item label="Slug">
-                <code>{detailModal.product.slug}</code>
-              </Descriptions.Item>
-              <Descriptions.Item label="Giá">
-                <Text type="success">
-                  {formatCurrency(detailModal.product.price)}
-                </Text>
-              </Descriptions.Item>
-              <Descriptions.Item label="Trạng thái">
-                <Badge
-                  status={
-                    statusColorMap[detailModal.product.is_active] === "green"
-                      ? "success"
-                      : "default"
-                  }
-                  text={String(detailModal.product.is_active).toUpperCase()}
-                />
-              </Descriptions.Item>
-              <Descriptions.Item label="Ngày tạo">
-                {formatDate(detailModal.product.createdAt)}
-              </Descriptions.Item>
-              <Descriptions.Item label="Xuất bản">
-                {formatDate(detailModal.product.published_at)}
-              </Descriptions.Item>
-              <Descriptions.Item label="Cập nhật">
-                {formatDate(detailModal.product.updatedAt)}
-              </Descriptions.Item>
-              <Descriptions.Item label="Người tạo">
-                <UserOutlined /> {getCreatorName(detailModal.product.creater)}
-              </Descriptions.Item>
-            </Descriptions>
+            <Row gutter={16} style={{ marginBottom: 16 }}>
+              <Col span={8}>
+                <div style={{ borderRadius: 12, overflow: "hidden", boxShadow: "0 6px 16px rgba(0,0,0,0.08)" }}>
+                  <img
+                    src={selectedImage || detailModal.product.image_url?.[0] || "/default-battery.jpg"}
+                    alt="Product"
+                    style={{ width: "100%", height: 300, objectFit: "cover", display: "block" }}
+                  />
+                </div>
+                <div style={{ display: "flex", gap: 8, marginTop: 8, overflowX: "auto" }}>
+                  {(detailModal.product.image_url || []).map((img, idx) => (
+                    <img
+                      key={idx}
+                      src={img}
+                      alt={`thumb-${idx}`}
+                      onClick={() => setSelectedImage(img)}
+                      style={{
+                        width: 76,
+                        height: 76,
+                        objectFit: "cover",
+                        borderRadius: 8,
+                        cursor: "pointer",
+                        border: selectedImage === img ? "3px solid #28a745" : "2px solid #e9ecef",
+                      }}
+                    />
+                  ))}
+                </div>
+              </Col>
+              <Col span={16}>
+                <Descriptions bordered column={2} size="small">
+                  <Descriptions.Item label="Tên" span={2}>
+                    <strong>{detailModal.product.battery?.[0]?.name || detailModal.product.battery?.name}</strong>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Slug">
+                    <code>{detailModal.product.slug}</code>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Giá">
+                    <Text type="success">{formatCurrency(detailModal.product.price)}</Text>
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Trạng thái">
+                    <Badge
+                      status={
+                        statusColorMap[detailModal.product.is_active] === "green" ? "success" : "default"
+                      }
+                      text={String(detailModal.product.is_active).toUpperCase()}
+                    />
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Ngày tạo">
+                    {formatDate(detailModal.product.createdAt)}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Xuất bản">
+                    {formatDate(detailModal.product.published_at)}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Cập nhật">
+                    {formatDate(detailModal.product.updatedAt)}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Người tạo">
+                    <UserOutlined /> {getCreatorName(detailModal.product.creater)}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Tồn kho">
+                    <Text 
+                      strong 
+                      style={{ 
+                        color: (detailModal.product.stock || 0) < 5 ? '#ff4d4f' : '#52c41a',
+                        fontSize: 16
+                      }}
+                    >
+                      {detailModal.product.stock || 0} sản phẩm
+                    </Text>
+                  </Descriptions.Item>
+                </Descriptions>
+              </Col>
+            </Row>
 
             <Space style={{ marginBottom: 16 }}>
               <Text strong>Thương hiệu:</Text>{" "}
@@ -661,50 +706,50 @@ export default function ProductManagement() {
               {getCategoryName(detailModal.product.category)}
             </Space>
 
-            {detailModal.product.battery?.[0] && (
-              <>
-                <Title level={5}>
-                  <Battery style={{ marginRight: 8 }} /> Thông tin Pin
-                </Title>
-                <Descriptions bordered column={2} size="small">
-                  <Descriptions.Item label="Tên pin">
-                    {detailModal.product.battery[0].name}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Slug pin">
-                    {detailModal.product.battery[0].slug}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Dung lượng">
-                    {detailModal.product.battery[0].capacity} kWh
-                  </Descriptions.Item>
-                  <Descriptions.Item label="SOH">
-                    {detailModal.product.battery[0].healthPercentage}%
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Quãng đường">
-                    {detailModal.product.battery[0].rangePerChange} km
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Chu kỳ">
-                    {detailModal.product.battery[0].changeCycles}
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Điện áp">
-                    {detailModal.product.battery[0].voltage}V
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Trạng thái">
-                    <Badge
-                      status={
-                        detailModal.product.battery[0].is_active
-                          ? "success"
-                          : "error"
-                      }
-                      text={
-                        detailModal.product.battery[0].is_active
-                          ? "Hoạt động"
-                          : "Không hoạt động"
-                      }
-                    />
-                  </Descriptions.Item>
-                </Descriptions>
-              </>
-            )}
+            {(() => {
+              const battery = Array.isArray(detailModal.product.battery) 
+                ? detailModal.product.battery[0] 
+                : detailModal.product.battery;
+              
+              if (!battery) return null;
+
+              return (
+                <>
+                  <Title level={5}>
+                    <Battery style={{ marginRight: 8 }} /> Thông tin Pin
+                  </Title>
+                  <Descriptions bordered column={2} size="small">
+                    <Descriptions.Item label="Tên pin">
+                      {battery.name}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Slug pin">
+                      {battery.slug}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Dung lượng">
+                      {battery.capacity} kWh
+                    </Descriptions.Item>
+                    <Descriptions.Item label="SOH">
+                      {battery.healthPercentage}%
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Quãng đường">
+                      {battery.rangePerChange} km
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Chu kỳ">
+                      {battery.changeCycles}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Điện áp">
+                      {battery.voltage}V
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Trạng thái">
+                      <Badge
+                        status={battery.is_active ? "success" : "error"}
+                        text={battery.is_active ? "Hoạt động" : "Không hoạt động"}
+                      />
+                    </Descriptions.Item>
+                  </Descriptions>
+                </>
+              );
+            })()}
 
             <Divider>Đánh giá sản phẩm</Divider>
 
@@ -849,31 +894,40 @@ export default function ProductManagement() {
               <Input />
             </Form.Item>
 
-            {/* Tên & Slug */}
+            {/* Slug - tên sản phẩm sẽ lấy từ battery.name */}
             <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item
-                  name="slug"
-                  label="Tên sản phẩm"
-                  rules={[{ required: true }]}
-                >
-                  <Input onChange={handleNameChange} />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
+              <Col span={24}>
                 <Form.Item
                   name="slug"
                   label="Slug"
-                  rules={[{ required: true }]}
+                  rules={[{ required: true, message: "Vui lòng nhập slug" }]}
                 >
-                  <Input />
+                  <Input 
+                    placeholder="VD: pin-tesla-m3-75kwh"
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            {/* Image URLs */}
+            <Row gutter={16}>
+              <Col span={24}>
+                <Form.Item
+                  name="image_url"
+                  label="URL Hình ảnh"
+                  tooltip="Nhập mỗi URL trên 1 dòng"
+                >
+                  <Input.TextArea 
+                    rows={3}
+                    placeholder={"Nhập URL hình ảnh (mỗi URL 1 dòng):\nhttps://example.com/image1.jpg\nhttps://example.com/image2.jpg"}
+                  />
                 </Form.Item>
               </Col>
             </Row>
 
             {/* Giá & Trạng thái */}
             <Row gutter={16}>
-              <Col span={8}>
+              <Col span={6}>
                 <Form.Item
                   name="price"
                   label="Giá (VND)"
@@ -882,7 +936,21 @@ export default function ProductManagement() {
                   <InputNumber style={{ width: "100%" }} min={0} />
                 </Form.Item>
               </Col>
-              <Col span={8}>
+              <Col span={6}>
+                <Form.Item
+                  name="stock"
+                  label="Tồn kho"
+                  rules={[{ required: true, type: "number" }]}
+                  tooltip="Cảnh báo nếu < 5"
+                >
+                  <InputNumber 
+                    style={{ width: "100%" }} 
+                    min={0}
+                    status={(form.getFieldValue('stock') || 0) < 5 ? 'warning' : ''}
+                  />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
                 <Form.Item
                   name="is_active"
                   label="Trạng thái"
@@ -896,7 +964,7 @@ export default function ProductManagement() {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={8}>
+              <Col span={6}>
                 <Form.Item name="published_at" label="Ngày xuất bản">
                   <Input type="datetime-local" style={{ width: "100%" }} />
                 </Form.Item>

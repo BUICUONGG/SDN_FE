@@ -73,6 +73,12 @@ export const appService = {
   getAllProduct: () => {
     return https.get(`/product`);
   },
+  createProduct: (data) => {
+    return https.post(`/product`, data);
+  },
+  deleteProduct: (id) => {
+    return https.delete(`/product/${id}`);
+  },
 
   createBrand: (data) => https.post(`/brand`, data),
   updateBrand: (id, data) => https.put(`/brand/${id}`, data),
