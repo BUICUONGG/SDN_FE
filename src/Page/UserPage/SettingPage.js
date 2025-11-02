@@ -597,7 +597,7 @@ export default function SettingPage() {
                                     const productName = typeof order.product === 'string' 
                                       ? order.product 
                                       : productData?.slug || productData?.name || productData?._id || 'Sản phẩm';
-                                    const productImage = productData?.image_url || productData?.image || 'https://via.placeholder.com/80';
+                                    const productImage = productData?.image_url[0] || productData?.image || 'https://via.placeholder.com/80';
 
                                     return (
                                       <Card 
