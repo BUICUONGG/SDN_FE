@@ -35,6 +35,7 @@ import SearchResults from "./Page/SearchPage/SearchResults";
 import OAuth2RedirectHandler from "./Page/OAuth2RedirectHandler";
 import AutionPage from "./Page/AutionPage/AutionPage";
 import AuctionDetail from "./Page/AutionPage/AutionDetail";
+import CreateAuctionPage from "./Page/AutionPage/CreateAuctionPage";
 
 function App() {
   // eslint-disable-next-line no-unused-vars
@@ -126,6 +127,7 @@ function App() {
           <Route path="/" element={<Layout Component={HomePage} />} />
           <Route path="/auction-channel" element={<Layout Component={AutionPage} />} />
           <Route path="/auction-channel/detail/:id" element={<Layout Component={AuctionDetail} />} />
+          <Route path="/create-auction" element={<Layout Component={CreateAuctionPage} />} />
           <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
           <Route path="/auth/google/callback" element={<OAuth2RedirectHandler />} />
           <Route path="/register-seller" element={<Layout Component={RegisterSeller} />} />
