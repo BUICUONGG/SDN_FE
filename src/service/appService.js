@@ -16,7 +16,7 @@ export const appService = {
     return https.post("/user-service/v1/account/resend-otp", data);
   },
   getProfile: () => {
-    return https.get("/user-service/v1/users/profile");
+    return https.get("/profile");
   },
   updateProfile: (data) => {
     return https.put("/user-service/v1/users", data);

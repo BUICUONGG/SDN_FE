@@ -173,7 +173,7 @@ export default function HeaderCart() {
               fontWeight: "500",
               transition: "font-size 0.3s ease-in-out",
             }}
-            href="/home"
+            href="/"
           >
             <span className="font-xmark">VINE</span>
             <span style={{

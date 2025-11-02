@@ -63,7 +63,7 @@ export default function DetailProduct() {
   const handleAddToCart = () => {
     const cartProduct = {
       id: product._id,
-      name: product.productName || `Pin ${product.battery[0]?.name}`,
+      name: product.slug || `Pin ${product.slug}`,
       price: product.price,
       image: product.image_url?.[0] || "/default-battery.jpg",
       quantity: 1,
@@ -78,7 +78,7 @@ export default function DetailProduct() {
   const handleBuyNow = () => {
     const cartProduct = {
       id: product._id,
-      name: product.productName || `Pin ${product.battery[0]?.name}`,
+      name: product.slug || `Pin ${product.slug}`,
       price: product.price,
       image: product.image_url?.[0] || "/default-battery.jpg",
       quantity: 1,
@@ -578,10 +578,6 @@ export default function DetailProduct() {
             <SpecRow label="Trạng thái" value={product.is_active === "complete" ? "Hoàn tất" : product.is_active} />
           </Section>
         </div>
-      </div>
-
-      <div style={{ marginTop: "32px" }}>
-        <OrtherProductShop />
       </div>
       <div style={{ marginTop: "32px" }}>
         <ProductLike />

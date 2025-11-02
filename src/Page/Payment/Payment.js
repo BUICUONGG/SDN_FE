@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "./Payment.css";
+import "./Payment.css"; // Giữ file CSS đã cung cấp trước đó
 import ProductLike from "../DetailProduct/ProductLike";
 import { useNavigate } from "react-router-dom";
 import {
@@ -22,10 +22,12 @@ export default function Payment() {
   const [selectedWardCode, setSelectedWardCode] = useState("");
 
   const [leadtime, setLeadtime] = useState(null);
+  const [couponCode, setCouponCode] = useState("");
 
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
     setCartItems(storedCart);
+    setSelectedItems(storedCart.map((item) => item.id));
   }, []);
 
   useEffect(() => {
@@ -41,43 +43,38 @@ export default function Payment() {
   };
 
   const handleSelectItem = (id) => {
-    if (selectedItems.includes(id)) {
-      setSelectedItems(selectedItems.filter((itemId) => itemId !== id));
-    } else {
-      setSelectedItems([...selectedItems, id]);
-    }
+    setSelectedItems((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
   };
 
-  const isAllSelected = selectedItems.length === cartItems.length;
+  const isAllSelected = selectedItems.length === cartItems.length && cartItems.length > 0;
 
-  const total = cartItems
-    .filter((item) => selectedItems.includes(item.id))
-    .reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
+  const selectedCartItems = cartItems.filter((item) => selectedItems.includes(item.id));
+  const total = selectedCartItems.reduce(
+    (sum, item) => sum + item.price * (item.quantity || 1),
+    0
+  );
 
   const updateQuantity = (id, change) => {
-    const updatedCart = cartItems.map((item) => {
-      if (item.id === id) {
-        const newQuantity = (item.quantity || 1) + change;
-        return {
-          ...item,
-          quantity: newQuantity > 0 ? newQuantity : 1,
-        };
-      }
-      return item;
-    });
-    setCartItems(updatedCart);
+    setCartItems((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? { ...item, quantity: Math.max(1, (item.quantity || 1) + change) }
+          : item
+      )
+    );
   };
 
   const deleteItem = (id) => {
-    const updatedCart = cartItems.filter((item) => item.id !== id);
-    setCartItems(updatedCart);
-    setSelectedItems(selectedItems.filter((itemId) => itemId !== id));
+    setCartItems((prev) => prev.filter((item) => item.id !== id));
+    setSelectedItems((prev) => prev.filter((itemId) => itemId !== id));
   };
 
   useEffect(() => {
     const fetchProvinces = async () => {
       const result = await getProvinces();
-      setProvinces(result);
+      setProvinces(result || []);
     };
     fetchProvinces();
   }, []);
@@ -85,19 +82,29 @@ export default function Payment() {
   const handleProvinceChange = async (e) => {
     const provinceId = parseInt(e.target.value);
     setSelectedProvinceId(provinceId);
-    const districts = await getDistricts(provinceId);
-    setDistricts(districts);
     setSelectedDistrictId(null);
-    setWards([]);
     setSelectedWardCode("");
+    setWards([]);
+    setLeadtime(null);
+    if (provinceId) {
+      const districtsData = await getDistricts(provinceId);
+      setDistricts(districtsData || []);
+    }
   };
 
   const handleDistrictChange = async (e) => {
     const districtId = parseInt(e.target.value);
     setSelectedDistrictId(districtId);
-    const wards = await getWards(districtId);
-    setWards(wards);
     setSelectedWardCode("");
+    setLeadtime(null);
+    if (districtId) {
+      const wardsData = await getWards(districtId);
+      setWards(wardsData || []);
+    }
+  };
+
+  const handleWardChange = (e) => {
+    setSelectedWardCode(e.target.value);
   };
 
   useEffect(() => {
@@ -108,206 +115,198 @@ export default function Payment() {
           to_ward_code: selectedWardCode,
           service_id: 53320,
         });
-        if (lead) setLeadtime(lead);
+        if (lead?.formatted) {
+          setLeadtime(new Date(lead.formatted));
+        }
       }
     };
     fetchLeadtime();
   }, [selectedDistrictId, selectedWardCode]);
 
+  const formatDate = (date) => {
+    if (!date) return "Đang cập nhật...";
+    return date.toLocaleDateString("vi-VN", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          padding: "2% 5%",
-          backgroundColor: "#f8f8f8",
-          boxSizing: "border-box",
-          gap: "2%",
-        }}
-      >
-        <div className="cart-section">
-          <div className="select-all">
-            <input
-              style={{ width: "16px", height: "16px" }}
-              type="checkbox"
-              checked={isAllSelected}
-              onChange={handleSelectAll}
-            />
-            <span>Chọn tất cả ({selectedItems.length})</span>
-          </div>
-          <hr />
-          {cartItems.map((item) => (
-            <div className="cart-item" key={item.id}>
+      <div className="payment-symmetric-container">
+        {/* Bên trái: Giỏ hàng - Chiếm 65% chiều rộng, cố định chiều cao để scroll độc lập */}
+        <div className="cart-section-symmetric">
+          <div className="cart-header-symmetric">
+            <label className="select-all-checkbox">
               <input
-                style={{ width: "16px", height: "16px" }}
                 type="checkbox"
-                checked={selectedItems.includes(item.id)}
-                onChange={() => handleSelectItem(item.id)}
+                checked={isAllSelected}
+                onChange={handleSelectAll}
               />
-              <img
-                onClick={() => navigate(`/product/${item.id}`)}
-                src={item.image}
-                alt={item.name}
-              />
-              <div className="item-info">
-                <div
-                  onClick={() => navigate(`/product/${item.id}`)}
-                  className="item-name"
-                  style={{ cursor: "pointer" }}
-                >
-                  {item.name}
-                </div>
-                <div className="item-color">{item.color}</div>
-                <div className="quantity">
-                  <button
-                    onClick={() => updateQuantity(item.id, -1)}
-                    style={{ border: "none", background: "transparent" }}
-                  >
-                    -
-                  </button>
-                  <input
-                    style={{
-                      border: "none",
-                      backgroundColor: "transparent",
-                      width: "30px",
-                      textAlign: "center",
-                    }}
-                    type="text"
-                    value={item.quantity || 1}
-                    readOnly
+              <span>Chọn tất cả ({selectedItems.length} sản phẩm)</span>
+            </label>
+          </div>
+
+          <div className="cart-items-list-symmetric">
+            {cartItems.length === 0 ? (
+              <p className="empty-cart">Giỏ hàng trống. Hãy thêm sản phẩm!</p>
+            ) : (
+              cartItems.map((item) => (
+                <div className="cart-item-card-symmetric" key={item.id}>
+                  <div className="item-select">
+                    <input
+                      type="checkbox"
+                      checked={selectedItems.includes(item.id)}
+                      onChange={() => handleSelectItem(item.id)}
+                    />
+                  </div>
+
+                  <img
+                    src={item.image || "/placeholder.jpg"}
+                    alt={item.name}
+                    className="item-image-symmetric"
+                    onClick={() => navigate(`/product/${item.id}`)}
                   />
+
+                  <div className="item-details-symmetric">
+                    <h4
+                      className="item-name"
+                      onClick={() => navigate(`/product/${item.id}`)}
+                    >
+                      {item.name}
+                    </h4>
+                    <p className="item-color">Màu: {item.color || "Không rõ"}</p>
+
+                    <div className="item-quantity-symmetric">
+                      <button
+                        onClick={() => updateQuantity(item.id, -1)}
+                        aria-label="Giảm"
+                      >
+                        −
+                      </button>
+                      <span>{item.quantity || 1}</span>
+                      <button
+                        onClick={() => updateQuantity(item.id, 1)}
+                        aria-label="Tăng"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="item-price-symmetric">
+                    {(item.price * (item.quantity || 1)).toLocaleString("vi-VN")}₫
+                  </div>
+
                   <button
-                    onClick={() => updateQuantity(item.id, 1)}
-                    style={{ border: "none", background: "transparent" }}
+                    className="delete-btn-symmetric"
+                    onClick={() => deleteItem(item.id)}
+                    aria-label="Xóa"
                   >
-                    +
+                    ×
                   </button>
                 </div>
-              </div>
-              <div className="item-price">
-                {(item.price * (item.quantity || 1)).toLocaleString()}₫
-              </div>
-              <button
-                onClick={() => deleteItem(item.id)}
-                className="delete"
-                style={{ border: "none", background: "transparent" }}
-              >
-                ×
-              </button>
-            </div>
-          ))}
+              ))
+            )}
+          </div>
         </div>
 
-        <div>
-          <div className="order-summary">
-            <h3>Thông tin đơn hàng</h3>
+        {/* Bên phải: Thông tin đơn hàng - Chiếm 35% chiều rộng, cố định (sticky) */}
+        <div className="order-summary-symmetric">
+          <h3>Thông tin đơn hàng</h3>
+
+          <div className="summary-details">
             <div className="summary-row">
-              <span>Tạm tính:</span>
-              <span>{total.toLocaleString()}₫</span>
+              <span>Tạm tính ({selectedItems.length} sp):</span>
+              <strong>{total.toLocaleString("vi-VN")}₫</strong>
             </div>
             <div className="summary-row">
               <span>Giảm giá:</span>
-              <span>0₫</span>
+              <strong>0₫</strong>
             </div>
-            <div className="summary-row total" style={{ marginBottom: "5%" }}>
+            <div className="summary-row total">
               <span>Tổng cộng:</span>
-              <span>{total.toLocaleString()}₫</span>
+              <strong className="grand-total">{total.toLocaleString("vi-VN")}₫</strong>
             </div>
-
-            <h4>Ước tính thời gian giao hàng</h4>
-            <p style={{ color: "black" }}>
-              {leadtime
-                ? leadtime.toLocaleDateString("vi-VN", {
-                    weekday: "long",
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })
-                : "Đang cập nhật..."}
-            </p>
-
-            <div className="shipping">
-              <select
-                style={{
-                  padding: "10px 0",
-                  borderRadius: "5px",
-                  outline: "none",
-                  width: "45%",
-                }}
-                onChange={handleProvinceChange}
-                value={selectedProvinceId || ""}
-              >
-                <option value="">Chọn tỉnh/ thành phố</option>
-                {provinces.map((p) => (
-                  <option key={p.ProvinceID} value={p.ProvinceID}>
-                    {p.ProvinceName}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                style={{
-                  padding: "10px 0",
-                  borderRadius: "5px",
-                  outline: "none",
-                  width: "45%",
-                }}
-                onChange={handleDistrictChange}
-                value={selectedDistrictId || ""}
-                disabled={!selectedProvinceId}
-              >
-                <option value="">Chọn quận/ huyện</option>
-                {districts.map((d) => (
-                  <option key={d.DistrictID} value={d.DistrictID}>
-                    {d.DistrictName}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                style={{
-                  padding: "10px 0",
-                  borderRadius: "5px",
-                  outline: "none",
-                  width: "45%",
-                  marginTop: "10px",
-                }}
-                onChange={(e) => setSelectedWardCode(e.target.value)}
-                value={selectedWardCode}
-                disabled={!selectedDistrictId}
-              >
-                <option value="">Chọn phường/ xã</option>
-                {wards.map((w) => (
-                  <option key={w.WardCode} value={w.WardCode}>
-                    {w.WardName}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <input
-              style={{
-                padding: "10px",
-                borderRadius: "5px",
-                outline: "none",
-                width: "100%",
-                marginBottom: "5%",
-                marginTop: "5%",
-              }}
-              type="text"
-              placeholder="Nhập mã khuyến mãi nếu có"
-              className="coupon"
-            />
-
-            <button onClick={() => navigate("/payment")} className="checkout-btn">
-              THANH TOÁN NGAY
-            </button>
           </div>
+
+          <div className="delivery-estimate">
+            <h4>Ước tính giao hàng</h4>
+            <p style={{color: 'black'}} className="leadtime-text">{formatDate(leadtime)}</p>
+          </div>
+
+          <div className="address-section-symmetric">
+            <h4>Địa chỉ nhận hàng</h4>
+            <select
+              value={selectedProvinceId || ""}
+              onChange={handleProvinceChange}
+              className="address-select-symmetric"
+            >
+              <option value="">Tỉnh/Thành phố</option>
+              {provinces.map((p) => (
+                <option key={p.ProvinceID} value={p.ProvinceID}>
+                  {p.ProvinceName}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={selectedDistrictId || ""}
+              onChange={handleDistrictChange}
+              disabled={!selectedProvinceId}
+              className="address-select-symmetric"
+            >
+              <option value="">Quận/Huyện</option>
+              {districts.map((d) => (
+                <option key={d.DistrictID} value={d.DistrictID}>
+                  {d.DistrictName}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={selectedWardCode}
+              onChange={handleWardChange}
+              disabled={!selectedDistrictId}
+              className="address-select-symmetric"
+            >
+              <option value="">Phường/Xã</option>
+              {wards.map((w) => (
+                <option key={w.WardCode} value={w.WardCode}>
+                  {w.WardName}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="coupon-section">
+            <input
+              type="text"
+              placeholder="Mã khuyến mãi"
+              value={couponCode}
+              onChange={(e) => setCouponCode(e.target.value)}
+              className="coupon-input"
+            />
+            <button className="apply-coupon-btn">Áp dụng</button>
+          </div>
+
+          <button
+            className="checkout-btn-symmetric"
+            disabled={selectedItems.length === 0 || !selectedWardCode}
+            onClick={() => navigate("/payment")}
+          >
+            {selectedItems.length === 0 ? "Chọn sản phẩm" : "THANH TOÁN NGAY"}
+          </button>
+
+          <p className="secure-note">
+            An toàn • Miễn phí ship đơn > 500k
+          </p>
         </div>
       </div>
 
-      <div style={{ padding: "10%" }}>
+      <div className="recommended-section">
         <ProductLike />
       </div>
     </>
