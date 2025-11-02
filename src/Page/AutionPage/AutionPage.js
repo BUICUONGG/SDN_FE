@@ -315,7 +315,7 @@ export default function AuctionPage() {
                       </div>
 
                       <div className="card-body">
-                        <div className="product-name">{product.slug || "Không tên"}</div>
+                        <div className="product-name">{product.battery?.name || "Không tên"}</div>
                         <p className="description">{auction.status || "Đang diễn ra"}</p>
 
                         <div className="info-row">

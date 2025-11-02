@@ -593,11 +593,17 @@ export default function SettingPage() {
                                     const discount = order.discount_value || 0;
                                     const finalPrice = totalPrice - discount;
                                     
-                                    const productData = typeof order.product === 'object' ? order.product : null;
+                                    let productData = null;
+                                    if (order.order_type === 'auction_win' && order.auction?.product) {
+                                      productData = order.auction.product;
+                                    } else if (typeof order.product === 'object') {
+                                      productData = order.product;
+                                    }
+                                    
                                     const productName = typeof order.product === 'string' 
                                       ? order.product 
-                                      : productData?.slug || productData?.name || productData?._id || 'Sản phẩm';
-                                    const productImage = productData?.image_url[0] || productData?.image || 'https://via.placeholder.com/80';
+                                      : productData?.battery?.name || productData?.name || productData?.slug || productData?._id || 'Sản phẩm';
+                                    const productImage = productData?.image_url?.[0] || productData?.image || 'https://via.placeholder.com/80';
 
                                     return (
                                       <Card 
@@ -656,16 +662,36 @@ export default function SettingPage() {
                                             <Col xs={24} sm={18} md={12}>
                                               <Space direction="vertical" size={4} style={{ width: '100%' }}>
                                                 <Text strong style={{ fontSize: 16 }}>{productName}</Text>
+                                                
                                                 {productData?.brand && (
                                                   <Text type="secondary" style={{ fontSize: 13 }}>
-                                                    Thương hiệu: {productData.brand}
+                                                    🏭 Thương hiệu: {typeof productData.brand === 'object' 
+                                                      ? productData.brand?.name || productData.brand?.slug || 'N/A'
+                                                      : productData.brand}
                                                   </Text>
                                                 )}
+                                                
                                                 {productData?.category && (
                                                   <Text type="secondary" style={{ fontSize: 13 }}>
-                                                    Danh mục: {productData.category}
+                                                    📂 Danh mục: {typeof productData.category === 'object'
+                                                      ? productData.category?.name || productData.category?.slug || 'N/A'
+                                                      : productData.category}
                                                   </Text>
                                                 )}
+                                                
+                                                {productData?.vehicle && productData.vehicle[0] && (
+                                                  <Text type="secondary" style={{ fontSize: 13 }}>
+                                                    🚗 Xe: {productData.vehicle[0].name} ({productData.vehicle[0].year})
+                                                  </Text>
+                                                )}
+                                                
+                                                {productData?.battery && (
+                                                  <Text type="secondary" style={{ fontSize: 13 }}>
+                                                    🔋 Pin: {productData.battery.capacity}kWh - SoH {productData.battery.healthPercentage}%
+                                                  </Text>
+                                                )}
+                                                
+                                                {/* Voucher */}
                                                 {order.voucher && (
                                                   <Tag color="green" style={{ marginTop: 4 }}>
                                                     <Text style={{ fontSize: 12 }}>
@@ -697,6 +723,32 @@ export default function SettingPage() {
                                               </Space>
                                             </Col>
                                           </Row>
+
+                                          {/* Auction Info */}
+                                          {order.order_type === 'auction_win' && order.auction && (
+                                            <div style={{ 
+                                              marginTop: 12, 
+                                              padding: 12, 
+                                              background: '#fff9e6',
+                                              borderLeft: '3px solid #faad14',
+                                              borderRadius: 4
+                                            }}>
+                                              <Text strong style={{ color: '#d48806', marginBottom: 8, display: 'block' }}>
+                                                🏆 Thông tin đấu giá
+                                              </Text>
+                                              <Space direction="vertical" size={4}>
+                                                <Text type="secondary">
+                                                  Giá khởi điểm: <strong>{order.auction.start_price?.toLocaleString('vi-VN')}₫</strong>
+                                                </Text>
+                                                <Text type="secondary">
+                                                  Giá thắng: <strong style={{ color: '#52c41a' }}>{order.auction.current_bid?.toLocaleString('vi-VN')}₫</strong>
+                                                </Text>
+                                                <Text type="secondary">
+                                                  Đặt cọc: <strong>{order.auction.deposit_required?.toLocaleString('vi-VN')}₫</strong>
+                                                </Text>
+                                              </Space>
+                                            </div>
+                                          )}
 
                                           {/* Cancellation Reason */}
                                           {order.status === 'cancelled' && order.cancellation_reason && (
