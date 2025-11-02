@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   Tag,
@@ -13,9 +13,28 @@ import {
 } from "antd";
 import { EyeOutlined, EditOutlined, DollarOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { BASE_URL2 } from "../../../service/config";
 
 const { Title } = Typography;
 const { Option } = Select;
+
+const STATUS_CONFIG = {
+  pending: { color: "orange", label: "Chờ xử lý" },
+  processing: { color: "blue", label: "Đang xử lý" },
+  shipped: { color: "cyan", label: "Đang giao" },
+  delivered: { color: "green", label: "Đã giao" },
+  completed: { color: "green", label: "Hoàn thành" },
+  cancelled: { color: "red", label: "Đã hủy" },
+};
+
+const getStatusTag = (status) => {
+  const config = STATUS_CONFIG[status] || { color: "default", label: status || "Chưa xác định" };
+  return (
+    <Tag color={config.color} style={{ fontWeight: 500 }}>
+      {config.label}
+    </Tag>
+  );
+};
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
@@ -25,15 +44,30 @@ export default function AdminOrders() {
   const [editVisible, setEditVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorInModal, setErrorInModal] = useState("");
+  const [newStatus, setNewStatus] = useState("");
 
   // === Fetch orders + products ===
   const fetchOrdersAndProducts = async () => {
     setLoading(true);
     try {
+      const userInfo = JSON.parse(localStorage.getItem("USER_INFO") || "{}");
+      const token = userInfo.token || userInfo.accessToken;
+
+      const headers = {
+        "Content-Type": "application/json",
+      };
+
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+        if (userInfo.userId || userInfo.user_id) {
+          headers["x-client-id"] = userInfo.userId || userInfo.user_id;
+        }
+      }
+
       // Gọi song song 2 API
       const [orderRes, productRes] = await Promise.all([
-        fetch("https://sdn302-be.onrender.com/api/orders"),
-        fetch("https://sdn302-be.onrender.com/api/product"),
+        fetch(`${BASE_URL2}/orders`, { headers }),
+        fetch(`${BASE_URL2}/product`, { headers }),
       ]);
 
       if (!orderRes.ok || !productRes.ok) {
@@ -42,9 +76,6 @@ export default function AdminOrders() {
 
       const orderData = await orderRes.json();
       const productData = await productRes.json();
-
-      console.log("✅ Orders API:", orderData);
-      console.log("✅ Products API:", productData);
 
       const orderList = Array.isArray(orderData?.orders)
         ? orderData.orders
@@ -72,7 +103,6 @@ export default function AdminOrders() {
       setOrders(mergedOrders);
       setProducts(productList);
     } catch (err) {
-      console.error("❌ Lỗi khi tải dữ liệu:", err);
       message.error(err.message || "Không thể tải dữ liệu");
       setOrders([]);
       setProducts([]);
@@ -89,28 +119,66 @@ export default function AdminOrders() {
   const handleUpdateStatus = async (orderId, newStatus) => {
     if (!orderId) return;
     setLoading(true);
+    setErrorInModal("");
+
     try {
+      // Lấy token từ localStorage
+      const userInfo = JSON.parse(localStorage.getItem("USER_INFO") || "{}");
+      const token = userInfo.token || userInfo.accessToken;
+      const clientId = userInfo.userId || userInfo.user_id;
+
+      // Validate authentication data
+      if (!token) {
+        throw new Error("Vui lòng đăng nhập lại để thực hiện thao tác này");
+      }
+
+      if (!clientId) {
+        throw new Error("Thiếu thông tin xác thực. Vui lòng đăng nhập lại");
+      }
+
+      // Build headers
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        "x-client-id": clientId,
+      };
+
       const res = await fetch(
-        `https://sdn302-be.onrender.com/api/orders/${orderId}`,
+        `${BASE_URL2}/orders/${orderId}`,
         {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers,
           body: JSON.stringify({ status: newStatus }),
         }
       );
 
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Cập nhật thất bại");
+        if (res.status === 401) {
+          throw new Error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
+        }
+
+        if (res.status === 403) {
+          throw new Error(
+            "Bạn không có quyền thực hiện thao tác này. Vui lòng kiểm tra:\n" +
+            "1. Bạn có đang đăng nhập với tài khoản Admin?\n" +
+            "2. Token có còn hợp lệ không?"
+          );
+        }
+
+        const contentType = res.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await res.json();
+          throw new Error(errorData.message || "Cập nhật thất bại");
+        } else {
+          const errorText = await res.text();
+          throw new Error(errorText || `Lỗi ${res.status}: Cập nhật thất bại`);
+        }
       }
 
       message.success("Cập nhật trạng thái đơn hàng thành công!");
       setEditVisible(false);
-      fetchOrdersAndProducts();
+      await fetchOrdersAndProducts();
     } catch (err) {
-      console.error("❌ Lỗi cập nhật trạng thái:", err);
       const msg = err.message || "Không thể cập nhật trạng thái";
       setErrorInModal(msg);
       message.error(msg);
@@ -128,8 +196,15 @@ export default function AdminOrders() {
   // === Modal Sửa trạng thái ===
   const showEdit = (order) => {
     setSelectedOrder(order);
+    setNewStatus(order.status || "pending");
     setErrorInModal("");
     setEditVisible(true);
+  };
+
+  const confirmUpdate = () => {
+    if (selectedOrder && newStatus) {
+      handleUpdateStatus(selectedOrder._id, newStatus);
+    }
   };
 
   // === Cột bảng ===
@@ -170,22 +245,7 @@ export default function AdminOrders() {
       title: "Trạng thái",
       dataIndex: "status",
       key: "status",
-      render: (status) => {
-        const colorMap = {
-          pending: "orange",
-          success: "green",
-          failed: "red",
-          cancelled: "default",
-        };
-        return (
-          <Tag
-            color={colorMap[status] || "default"}
-            style={{ fontWeight: 500 }}
-          >
-            {status || "Chưa xác định"}
-          </Tag>
-        );
-      },
+      render: (status) => getStatusTag(status),
     },
     {
       title: "Ngày tạo",
@@ -279,7 +339,7 @@ export default function AdminOrders() {
               {selectedOrder?.auction?.current_bid?.toLocaleString("vi-VN")} ₫
             </Descriptions.Item>
             <Descriptions.Item label="Trạng thái">
-              <Tag color="blue">{selectedOrder.status || "Chưa xác định"}</Tag>
+              {getStatusTag(selectedOrder.status)}
             </Descriptions.Item>
             <Descriptions.Item label="Ngày tạo">
               {dayjs(selectedOrder.createdAt).format("DD/MM/YYYY HH:mm")}
@@ -299,7 +359,26 @@ export default function AdminOrders() {
           setEditVisible(false);
           setErrorInModal("");
         }}
-        footer={null}
+        footer={[
+          <Button
+            key="cancel"
+            onClick={() => {
+              setEditVisible(false);
+              setErrorInModal("");
+            }}
+            disabled={loading}
+          >
+            Hủy
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            onClick={confirmUpdate}
+            loading={loading}
+          >
+            Cập nhật
+          </Button>,
+        ]}
         width={500}
       >
         {selectedOrder && (
@@ -319,17 +398,16 @@ export default function AdminOrders() {
             <div style={{ marginBottom: 24 }}>
               <span>Trạng thái đơn hàng:</span>
               <Select
-                defaultValue={selectedOrder.status || "pending"}
+                value={newStatus}
                 style={{ width: "100%", marginTop: 8 }}
-                onChange={(value) =>
-                  handleUpdateStatus(selectedOrder._id, value)
-                }
+                onChange={(value) => setNewStatus(value)}
                 disabled={loading}
               >
-                <Option value="pending">Pending</Option>
-                <Option value="success">Success</Option>
-                <Option value="failed">Failed</Option>
-                <Option value="cancelled">Cancelled</Option>
+                {Object.entries(STATUS_CONFIG).map(([key, config]) => (
+                  <Option key={key} value={key}>
+                    <Tag color={config.color}>{config.label}</Tag>
+                  </Option>
+                ))}
               </Select>
             </div>
           </div>

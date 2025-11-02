@@ -70,12 +70,13 @@ export default function UserLogin({ onLogin }) {
           password: pass,
         };
         const res = await userService.postLogin(loginData);
-        console.log("API response:", res.data);
-        
-        if (res.data.status === true && res.data.metadata) {
-          localUserService.set(res.data);
-          console.log(res);
-          localStorage.setItem("token", "your_jwt_token");
+
+        const userData = res.data.metadata || res.data;
+        const hasToken = userData.token || userData.accessToken;
+
+        if (hasToken) {
+          localUserService.set(userData);
+
           setTimeout(() => {
             setIsLoading(false)
             setIsSuc(true)
@@ -89,21 +90,28 @@ export default function UserLogin({ onLogin }) {
               }, 1500);
             }
           }, 3000);
+        } else {
+          throw new Error("Không tìm thấy token trong phản hồi đăng nhập");
         }
       } catch (err) {
-        console.error("Lỗi đăng nhập:", err.response.data.metadata.message);
+        const errorMsg =
+          err.response?.data?.metadata?.message ||
+          err.response?.data?.message ||
+          err.message ||
+          "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin";
+
         setTimeout(() => {
             setIsLoading(false)
             setIsFail(true)
             openNotification(
                 "error",
                 "Thất bại",
-                err.response.data.metadata.message
+                errorMsg
               );
           }, 1500);
         setTimeout(() => {
             setIsFail(false)
-            
+
           }, 3000);
       }
     }

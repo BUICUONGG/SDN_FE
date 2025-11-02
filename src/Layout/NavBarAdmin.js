@@ -122,7 +122,7 @@ export default function NavBarAdmin({ Component }) {
 
               {/* op3 */}
               <div>
-                <div
+                {/* <div
                   className={`sidebar-item ${
                     activeKey === "payments" ? "active" : ""
                   }`}
@@ -132,7 +132,7 @@ export default function NavBarAdmin({ Component }) {
                     <CreditCardOutlined />
                   </span>
                   <span className="sidebar-label">Quản lý thanh toán</span>
-                </div>
+                </div> */}
 
                 <div
                   className={`sidebar-item ${
