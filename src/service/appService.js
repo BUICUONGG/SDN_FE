@@ -86,8 +86,16 @@ export const appService = {
   createCategory: (data) => https.post(`/category`, data),
   updateCategory: (id, data) => https.put(`/category/${id}`, data),
   deleteCategory: (id) => https.delete(`/category/${id}`),
+  getAutions: () => https.get(`/auctions`),
+  getAutionDetail: (id) => https.get(`/auctions/${id}`),
+  postAutionBid: (id, bidAmount) => https.post(`/auctions/${id}/bid`,{ bid_amount: bidAmount }),
 
+  getWalletBalance: () => https.get('/wallet/balance'),
+  depositToWallet: (amount) => https.post('/wallet/deposit', { amount }),
+  withdrawFromWallet: (amount) => https.post('/wallet/withdraw', { amount }),
+  bidAuction: (auctionId, amount) => https.post(`/auctions/${auctionId}/bid`, { amount }),
 
+  getTransactionHistory: () => https.get('/wallet/transactions'),
 
   searchProducts: (criteria) => {
     return https.get("/product-service/api/v1/products", {
