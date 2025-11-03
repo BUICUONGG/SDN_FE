@@ -112,6 +112,7 @@ export default function DetailProduct() {
       .catch((err) => console.error("Lỗi lấy reviews:", err));
   };
 
+  console.log(reviews)
   useEffect(() => {
     fetchReviews();
   }, []);
@@ -119,10 +120,14 @@ export default function DetailProduct() {
   // === LỌC REVIEWS THEO SẢN PHẨM ===
   useEffect(() => {
     if (product && reviews.length > 0) {
-      const filtered = reviews.filter((r) => r.product === product._id);
+      const filtered = reviews.filter((r) => r.product._id === product._id);
+      console.log(filtered)
       setProductReviews(filtered);
     }
   }, [product, reviews]);
+
+
+  console.log(product._id)
 
   // === LẤY THÔNG TIN SHOP ===
   useEffect(() => {
@@ -731,6 +736,8 @@ const ReviewForm = ({ productId, userId, onReviewSubmitted }) => {
       api.error({ message: "Lỗi", description: "Vui lòng chọn sao và nhập nội dung!" });
       return;
     }
+
+    console.log(userId)
 
     setLoading(true);
     try {
